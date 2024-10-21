@@ -215,7 +215,7 @@ for fn in imgfiles:
         out_t, out_s = deep_wb(img, task=args.task.lower(), net_s=net_s, net_t=net_t, device=device, s=S)
 
         if target_color_temp:
-            out = utls.colorTempInterpolate_w_target(out_t, out_s, target_color_temp)
+            out = utls.colorTempInterpolate_w_target(out_t, out_s, target_color_tempython)
             if tosave:
                 out = utls.to_image(out)
                 out.save(os.path.join(out_dir, name + '_%d.png' % target_color_temp))
