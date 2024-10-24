@@ -3,6 +3,7 @@ import { useState } from "react";
 
 function App() {
   const [imgSrc, setImgSrc] = useState('');
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files[0]) {
