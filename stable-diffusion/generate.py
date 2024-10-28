@@ -9,7 +9,7 @@ model_id_or_path = "runwayml/stable-diffusion-v1-5"
 pipe = StableDiffusionImg2ImgPipeline.from_pretrained(
 	model_id_or_path,
   safety_checker = None
-).to("cuda")
+)
 
 pipe = pipe.to("mps")
 
@@ -25,4 +25,4 @@ init_image = init_image.resize((768, 512))
 improperly_colored_outfit = pipe(prompt=prompt, image=init_image, strength=0.75, guidance_scale=7.5).images
 
 # improperly_colored_outfit[0]
-improperly_colored_outfit.save("generated_outfit.png")
+improperly_colored_outfit[0].save("generated_outfit.png")
