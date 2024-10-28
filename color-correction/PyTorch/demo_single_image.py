@@ -53,7 +53,7 @@ def get_args():
         dest="S",
     )
     parser.add_argument(
-        "--show", "-v", action="store_true", default=True, help="Visualize the input and output images", dest="show"
+        "--show", "-v", action="store_true", default=False, help="Visualize the input and output images", dest="show"
     )
     parser.add_argument("--save", "-s", action="store_true", help="Save the output images", default=True, dest="save")
     parser.add_argument("--device", "-d", default="cuda", help="Device: cuda or cpu.", dest="device")
