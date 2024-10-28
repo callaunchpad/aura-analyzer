@@ -15,3 +15,7 @@ python3 ../../color-correction/PyTorch/demo_single_image.py --i "../input-imgs/$
 # Run facial detection
 python3 ../../face-detect/facedec/facedetect.py --i  "../intermediate-imgs/temp.png"
 #SHOULD BE TEMP
+
+# run below script in command line to test 
+# ./run_demo.sh IMG_6119.jpg
+
