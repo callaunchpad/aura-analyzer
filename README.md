@@ -7,8 +7,8 @@ aura analyzer is a project designed to perform seasonal color analysis and match
 before running the demo, make sure to install the following dependencies:
 
 1. Python 3.6
-2. PyTorch (tested with versions 1.2.0 and 1.5.0)
-3. Torchvision (tested with versions 0.4.0 and 0.6.0)
+2. PyTorch
+3. Torchvision
 4. CUDA Toolkit
 5. TensorBoard (optional)
 6. NumPy

@@ -1,0 +1,14 @@
+pytorch
+torchvision
+cuda-python
+tensorboard
+numpy
+Pillow
+future
+tqdm
+matplotlib
+scipy
+scikit-learn
+opencv-python
+Pylette
+mediapipe
