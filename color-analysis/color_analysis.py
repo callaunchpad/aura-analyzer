@@ -105,6 +105,19 @@ def parse_color_analysis_results(result):
     else:
         return "spring"
     
+def display_season_palette(season):
+    if (season == "summer"):
+        palette = extract_colors(image='../../color-analysis/season-palettes/cool-summer.JPG', palette_size=48)
+    elif (season == "winter"):
+        palette = extract_colors(image='../../color-analysis/season-palettes/cool-winter.JPG', palette_size=48)
+    elif (season == "autumn"):
+        palette = extract_colors(image='../../color-analysis/season-palettes/warm-autumn.JPG', palette_size=48)
+    else:
+        palette = extract_colors(image='../../color-analysis/season-palettes/warm-spring.JPG', palette_size=48)
+    
+    palette.display(save_to_file=True, filename="../output-imgs/your-palette")
+    return
+    
 # python script code
 # import argparser
 import argparse
@@ -122,4 +135,7 @@ color_analysis_result = color_analysis(IMAGE_FILE)
 
 # separate color analysis results
 season = parse_color_analysis_results(color_analysis_result)
-print('your season is ' + season)
+print(f'your color season is {season}')
+
+# display color palette
+display_season_palette(season)
