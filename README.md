@@ -20,11 +20,12 @@ before running the demo, make sure to install the following dependencies:
 12. scikit-learn
 13. OpenCV-Python
 14. Pylette
+15. mediapipe
 
 install these dependencies using `pip`:
 
 ```bash
-pip install torch==1.5.0 torchvision==0.6.0 cudatoolkit numpy pillow future tqdm matplotlib scipy scikit-learn opencv-python tensorboard Pylette
+pip install -r requirements.txt
 ```
 
 ## run demo
