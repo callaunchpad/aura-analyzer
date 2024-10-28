@@ -82,6 +82,7 @@ def is_high_low_contrast(skin_tone, hair_color, eye_color):
 
 def color_analysis(image_path):
     palette = extract_colors(image=image_path, palette_size=3)
+    # palette.display()
     skin_tone = palette.colors[0]
     hair_color = palette.colors[1]
     eye_color = palette.colors[2]

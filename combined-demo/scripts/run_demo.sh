@@ -17,8 +17,8 @@ python ../../face-detect/facedec/facedetect.py --i  "../intermediate-imgs/temp.p
 #SHOULD BE TEMP
 
 # Run color analysis
-python ../../color-analysis/color_analysis.py --i "../output-imgs/IMG_6119_AWB.png"
+python ../../color-analysis/color_analysis.py --i "../output-imgs/cropped.jpg"
 
 # run below script in command line to test 
-# ./run_demo.sh IMG_6119.jpg
-
+# ./run_demo.sh [image-name.jpg]
+# example: ./run_demo.sh IMG_6119.jpg
