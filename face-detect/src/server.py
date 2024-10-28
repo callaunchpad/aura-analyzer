@@ -1,6 +1,6 @@
 # server.py
 from flask import Flask, request, jsonify
-from facedec import takeImage
+from src import takeImage
 
 app = Flask(__name__)
 
