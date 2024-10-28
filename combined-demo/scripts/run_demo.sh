@@ -10,9 +10,8 @@ fi
 IMAGE_FILE=$1
 
 # Run the Python script with the JPEG file
-python ../../color-correction/PyTorch/demo_single_image.py --i "../input-imgs/$IMAGE_FILE" -t AWB -o ../intermediate-imgs  -v False
+python3 ../../color-correction/PyTorch/demo_single_image.py --i "../input-imgs/$IMAGE_FILE" -t AWB  -o ../intermediate-imgs 
 
 # Run facial detection
-python ../../face-detect/facedec/facedetect.py --i  "../intermediate-imgs/temp.png"
-
-# ./run_demo.sh IMG_6119.jpg
+python3 ../../face-detect/facedec/facedetect.py --i  "../intermediate-imgs/temp.png"
+#SHOULD BE TEMP

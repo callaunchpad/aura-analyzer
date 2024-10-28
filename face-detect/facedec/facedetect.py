@@ -101,6 +101,10 @@ rgb_annotated_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
 rgb_annotated_image = imutils.resize(rgb_annotated_image, width=800)
 
 # SAVE CROPPED AS IMAGE: cv2.imwrite("cropped.jpg", cropped)
+
+cv2.imwrite("../../face-detect/public/redbox.jpg", rgb_annotated_image)
+cv2.imwrite("../../face-detect/public/cropped.jpg", cropped)
+
 cv2.imshow("Gotchaface", rgb_annotated_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
