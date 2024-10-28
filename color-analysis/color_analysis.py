@@ -35,8 +35,8 @@ is_warm = 0 # if 0, cool else warm
 is_high_contrast = 0 # if 0 low contrast, else high contrast
 
 def is_warm_cool(skin_tone):
-    r = skin_tone[0]
-    b = skin_tone[2]
+    r = skin_tone.rgb[0]
+    b = skin_tone.rgb[2]
     rb_diff = r - b
     if (rb_diff <= warm_cool_rgb_cutoff):
         is_warm = 0
@@ -82,9 +82,9 @@ def is_high_low_contrast(skin_tone, hair_color, eye_color):
 
 def color_analysis(image_path):
     palette = extract_colors(image=image_path, palette_size=3)
-    skin_tone = palette[0]
-    hair_color = palette[1]
-    eye_color = palette[2]
+    skin_tone = palette.colors[0]
+    hair_color = palette.colors[1]
+    eye_color = palette.colors[2]
 
     is_warm = is_warm_cool(skin_tone)
     is_high_contrast = is_high_low_contrast(skin_tone, hair_color, eye_color)
@@ -92,5 +92,34 @@ def color_analysis(image_path):
     result = [is_warm, is_high_contrast]
     return result
 
+def parse_color_analysis_results(result):
+    warm_cool = result[0]
+    contrast = result[1]
 
+    if (warm_cool == 0 and contrast == 0):
+        return "summer"
+    elif (warm_cool == 0 and contrast == 1):
+        return "winter"
+    elif (warm_cool == 1 and contrast == 1):
+        return "autumn"
+    else:
+        return "spring"
+    
+# python script code
+# import argparser
+import argparse
 
+# process args
+parser = argparse.ArgumentParser(description="Detecting and cropping face")
+parser.add_argument("--input", "-i", help="Input image filename", dest="input", default="../example_images/00.JPG")
+args = parser.parse_args()
+
+# load input image
+IMAGE_FILE = args.input
+
+# run color analysis
+color_analysis_result = color_analysis(IMAGE_FILE)
+
+# separate color analysis results
+season = parse_color_analysis_results(color_analysis_result)
+print('your season is ' + season)
