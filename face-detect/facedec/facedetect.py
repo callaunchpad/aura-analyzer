@@ -5,6 +5,7 @@ from typing import Tuple, Union
 import cv2
 import numpy as np
 from PIL import Image
+import imutils
 
 MARGIN = 10  # pixels
 ROW_SIZE = 10  # pixels
@@ -94,8 +95,10 @@ detection_result = detector.detect(image)
 # STEP 5: Process the detection result. In this case, visualize it.
 image_copy = np.copy(image.numpy_view())
 annotated_image, cropped = visualize(image_copy, detection_result)
+cropped = imutils.resize(cropped, width=800)
 img = cv2.imread(IMAGE_FILE)
 rgb_annotated_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
+rgb_annotated_image = imutils.resize(rgb_annotated_image, width=800)
 
 # SAVE CROPPED AS IMAGE: cv2.imwrite("cropped.jpg", cropped)
 
