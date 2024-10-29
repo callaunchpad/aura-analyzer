@@ -24,7 +24,7 @@ we will take this value by finding the hsv of skin tone and taking the v value
 """
 from Pylette import extract_colors
 
-warm_cool_rgb_cutoff = 88 # if <= cool, else warm
+warm_cool_rgb_cutoff = 48 # if <= cool, else warm
 alg_switchpoint = 62 # if v of skin <= switch to modified contrast alg
 alg_switchpoint2 = 50 # if v of skin < switch to alt mod alg
 contrast_wh = 55 # if max(abs(skin_v - hair_v), abs(skin_v - eye_v)) <= spring/summer else autumn/winter
@@ -81,11 +81,15 @@ def is_high_low_contrast(skin_tone, hair_color, eye_color):
             return is_high_contrast
 
 def color_analysis(image_path):
-    palette = extract_colors(image=image_path, palette_size=3)
+    palette = extract_colors(image=image_path, palette_size=3, sort_mode="frequency")
     # palette.display()
     skin_tone = palette.colors[0]
     hair_color = palette.colors[1]
     eye_color = palette.colors[2]
+
+    print(skin_tone.rgb)
+    print(hair_color.rgb)
+    print(eye_color.rgb)
 
     is_warm = is_warm_cool(skin_tone)
     is_high_contrast = is_high_low_contrast(skin_tone, hair_color, eye_color)
