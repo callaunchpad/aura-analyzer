@@ -10,14 +10,14 @@ fi
 IMAGE_FILE=$1
 
 # Run the Python script with the JPEG file
-python ../../color-correction/PyTorch/demo_single_image.py --i "../input-imgs/$IMAGE_FILE" -t AWB  -o ../intermediate-imgs 
+python3 ../../color-correction/PyTorch/demo_single_image.py --i "../input-imgs/$IMAGE_FILE" -t AWB  -o ../intermediate-imgs 
 
 # Run facial detection
-python ../../face-detect/facedec/facedetect.py --i  "../intermediate-imgs/temp.png"
+python3 ../../face-detect/facedec/facedetect.py --i  "../intermediate-imgs/temp.png"
 #SHOULD BE TEMP
 
 # Run color analysis
-python ../../color-analysis/color_analysis.py --i "../output-imgs/cropped.jpg"
+python3 ../../color-analysis/color_analysis.py --i "../output-imgs/cropped.jpg"
 
 # run below script in command line to test 
 # ./run_demo.sh [image-name.jpg]
