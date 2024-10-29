@@ -12,3 +12,4 @@ scikit-learn
 opencv-python
 Pylette
 mediapipe
+imutils
