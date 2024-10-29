@@ -4,6 +4,14 @@ aura analyzer is a project designed to perform seasonal color analysis and match
 
 ## installation
 
+it is highly recommended that you create a new virtual environment before installing dependencies. you can do this with conda, venv, or any other alternatives you see fit. here is an example of how to create and activate a conda environment:
+```bash
+conda create --name aura-analyzer
+```
+```bash
+conda activate aura-analyzer
+```
+
 before running the demo, make sure to install the following dependencies:
 
 1. Python 3.6
