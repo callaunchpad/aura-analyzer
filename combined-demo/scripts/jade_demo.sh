@@ -20,5 +20,5 @@ python ../../face-detect/facedec/facedetect.py --i  "../intermediate-imgs/temp.p
 python ../../color-analysis/color_analysis.py --i "../output-imgs/cropped.jpg"
 
 # run below script in command line to test 
-# ./run_demo.sh [image-name.jpg]
-# example: ./run_demo.sh IMG_6119.jpg
+# ./jade_demo.sh [image-name.jpg]
+# example: ./jade_demo.sh IMG_6119.jpg
