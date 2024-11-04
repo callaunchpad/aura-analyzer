@@ -2,7 +2,7 @@
 
 aura analyzer is a project designed to perform seasonal color analysis and match users to their ideal color palette and a recommended outfit!
 
-## installation
+## installation (for windows)
 
 it is highly recommended that you create a new virtual environment before installing dependencies. you can do this with conda, venv, or any other alternatives you see fit. here is an example of how to create and activate a conda environment:
 ```bash
@@ -49,4 +49,24 @@ cd combined-demo/scripts
 3. for a sample image, run the following:
 ```bash
 ./run_demo.sh IMG_6119.jpg
+```
+
+## installation (for mac)
+
+1. remove CUDA Toolkit from requirements.txt
+2. run the following commands in aura-analyzer:
+```bash
+conda create -n aura-analyzer python=3.9 
+
+source activate aura-analyzer
+
+pip install -r requirements.txt
+
+conda install -c nvidia cuda-python
+
+cd combined-demo/scripts
+
+chmod +x ./run_demo.sh
+
+./run_demo.sh image-name.jpg
 ```
