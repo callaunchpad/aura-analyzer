@@ -16,6 +16,9 @@ FONT_SIZE = 1
 FONT_THICKNESS = 1
 TEXT_COLOR = (255, 0, 0)  # red
 
+# trying soemthing new 
+# just want to test
+# please delete later
 
 def _normalized_to_pixel_coordinates(
     normalized_x: float, normalized_y: float, image_width: int, image_height: int
