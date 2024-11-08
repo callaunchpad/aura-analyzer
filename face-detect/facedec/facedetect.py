@@ -136,9 +136,10 @@ def visualize(image, detection_result) -> np.ndarray:
 # STEP 1: Import the necessary modules.
 import mediapipe as mp
 from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
+from mediapipe.tasks.python import vision 
 
 # STEP 2: Create an FaceDetector object.
+# i want to add more code
 
 base_options = python.BaseOptions(model_asset_path="../../face-detect/facedec/detector.tflite")
 options = vision.FaceDetectorOptions(base_options=base_options)
