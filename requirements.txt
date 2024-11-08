@@ -1,6 +1,5 @@
 torch
 torchvision==0.19.1
-cuda-python
 tensorboard
 numpy
 Pillow
