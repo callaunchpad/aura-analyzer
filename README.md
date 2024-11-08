@@ -70,4 +70,4 @@ chmod +x ./run_demo.sh
 
 ./run_demo.sh image-name.jpg
 ```
-mischa tests
+s
