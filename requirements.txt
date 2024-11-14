@@ -1,5 +1,6 @@
 torch
 torchvision==0.19.1
+tensorflow
 tensorboard
 numpy
 Pillow
@@ -12,3 +13,5 @@ opencv-python
 Pylette
 mediapipe
 imutils
+requests
+beautifulsoup4

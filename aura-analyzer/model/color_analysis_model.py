@@ -1,7 +1,12 @@
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import requests
+from bs4 import BeautifulSoup
+import os
+import urllib
 
-# Initialize the model
+# Initialize the model 
 model = Sequential()
 
 # Add convolutional and pooling layers
@@ -20,9 +25,6 @@ model.add(Dense(4, activation='softmax'))  # 4 output classes for each season
 
 # Compile the model
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
-
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # Data Augmentation
 datagen = ImageDataGenerator(
