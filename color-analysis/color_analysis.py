@@ -143,4 +143,4 @@ season = parse_color_analysis_results(color_analysis_result)
 print(f'your color season is {season}')
 
 # display color palette
-display_season_palette(season)
+# display_season_palette(season)

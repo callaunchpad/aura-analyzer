@@ -5,7 +5,7 @@ from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
 from PIL import Image
 from io import BytesIO
-
+import subprocess
 app = FastAPI()
 
 class Item(BaseModel):
@@ -27,23 +27,18 @@ def read_item(item_id: int, q: Union[str, None] = None):
 def update_item(item_id: int, item: Item):
     return {"item_name": item.name, "item_id": item_id}
 
-@app.post("/files/")
-async def create_file(file: Annotated[bytes | None, File()] = None):
-    
-    if not file:
-        return {"message": "No file sent"}
-    else:
-        return FileResponse("combined-demo/input-imgs/sza.jpg")
-
 # Upload file endpoint
 @app.post("/uploadfile/")
 async def create_upload_file(
     file: Annotated[UploadFile, File(description="A file read as UploadFile")],
 ):
-    name = file.filename
+    name = "combined-demo/input-imgs/" + file.filename
     contents = file.file.read()
     im = Image.open(BytesIO(contents))
     im.save(name)
-
-    return FileResponse(name)
+    result = subprocess.call(['combined-demo/scripts/run_demo.sh', name],  capture_output=True, text=True, check=True)
+    print(result.stdout)
+    # output_filename = "combined-demo/output-imgs/" + file.file
+    redbox_file = "combined-demo/output-imgs/redbox.jpg"
+    return FileResponse(redbox_file)
     # return {"filename": file.filename, "content": contents}
