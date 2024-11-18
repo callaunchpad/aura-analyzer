@@ -16,3 +16,5 @@ requests
 beautifulsoup4
 mediapipe
 imutils
+requests
+beautifulsoup4
