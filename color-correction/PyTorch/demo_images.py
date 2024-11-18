@@ -60,6 +60,7 @@ if __name__ == "__main__":
     S = args.S
     target_color_temp = args.target_color_temp
     tosave = args.save
+    print(input_dir, out_dir)
 
     if target_color_temp:
         assert 2850 <= target_color_temp <= 7500, (

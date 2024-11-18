@@ -1,8 +1,10 @@
 torch
 torchvision==0.19.1
+tensorflow
 tensorboard
 numpy
 Pillow
+pandas
 future
 tqdm
 matplotlib
@@ -10,5 +12,7 @@ scipy
 scikit-learn
 opencv-python
 Pylette
+requests
+beautifulsoup4
 mediapipe
 imutils
