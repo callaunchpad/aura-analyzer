@@ -3,5 +3,5 @@
 *.py[cod]
 
 # tester output images
-combined-demo/intermediate-images/*.*
-combined-demo/output-images/*.*
+combined-demo/intermediate-imgs/*.*
+combined-demo/output-imgs/*.*
