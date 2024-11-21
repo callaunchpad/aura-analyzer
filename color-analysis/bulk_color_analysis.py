@@ -1,25 +1,15 @@
 """ 
-init vars for color analysis sorting 
+possible base colors:
+['Navy Blue' 'Blue' 'Silver' 'Black' 'Grey' 'Green' 'Purple' 'White'
+ 'Beige' 'Brown' 'Bronze' 'Teal' 'Copper' 'Pink' 'Off White' 'Maroon'
+ 'Red' 'Khaki' 'Orange' 'Coffee Brown' 'Yellow' 'Charcoal' 'Gold' 'Steel'
+ 'Tan' 'Multi' 'Magenta' 'Lavender' 'Sea Green' 'Cream' 'Peach' 'Olive'
+ 'Skin' 'Burgundy' 'Grey Melange' 'Rust' 'Rose' 'Lime Green' 'Mauve'
+ 'Turquoise Blue' 'Metallic' 'Mustard' 'Taupe' 'Nude' 'Mushroom Brown' nan
+ 'Fluorescent Green']
 
-warm_cool_rgb_cutoff calculated via random sample of people from each of the 
-12 color seasons using rgb values of skin tone -- given the fact that all human skin
-tones will have a baseline amount of redness, we found that the difference between red value
-and blue value will always be positive. however, higher blue values or cool toned skin
-will result in a smaller difference between the two while higher red values or warm toned
-skin will result in a bigger difference between the two. we assigned a value of 88 to be
-the cutoff r-b difference, where differences less than or equal to 88 indicates cool tones
-and differences more than 88 indicates warm tones
-
-contrast vars:
-we switch to hsv values to better calculate contrast
-contrast_cutoff_wh calcuated via random sample of people from each of the 
-12 color seasons using hsv values of skin tone and eyes. 
-
-contrast_wh
-
-alg_switchpoint is rough estimate of when a person might have darker skin and contrast will be lower.
-we will take this value by finding the hsv of skin tone and taking the v value
-
+tldr map the base color in image to it's nearest neighbor in the color palettes, 
+check which color palette that is and sort it into that season
 
 """
 
@@ -33,15 +23,8 @@ import pandas as pd
 from Pylette import extract_colors
 from tqdm import tqdm
 
-warm_cool_rgb_cutoff = 48  # if <= cool, else warm
-alg_switchpoint = 62  # if v of skin <= switch to modified contrast alg
-alg_switchpoint2 = 50  # if v of skin < switch to alt mod alg
-contrast_wh = 55  # if max(abs(skin_v - hair_v), abs(skin_v - eye_v)) <= spring/summer else autumn/winter
-contrast_alt = 45  # if max(abs(skin_v - hair_v), abs(skin_v - eye_v)) <= spring/summer else autumn/winter
-contrast_alt2 = 20  # if max(abs(skin_v - hair_v), abs(skin_v - eye_v)) <= spring/summer else autumn/winter
-
-is_warm = 0  # if 0, cool else warm
-is_high_contrast = 0  # if 0 low contrast, else high contrast
+import numpy as np
+from typing import Tuple
 
 con = sqlite3.connect("small-fashion-dataset.db")
 
@@ -72,10 +55,16 @@ def run_color_analysis(dir: str, styles_dir):
     # get all files in dir
     files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
 
+    # create color palettes for each season first
+    summer_palette = extract_colors(image="nonspecific-season-palettes/summer-palette.jpg", palette_size=144, sort_mode="luminance")
+    spring_palette = extract_colors(image="nonspecific-season-palettes/spring-palette.jpg", palette_size=144, sort_mode="luminance")
+    winter_palette = extract_colors(image="nonspecific-season-palettes/winter-palette.jpg", palette_size=144, sort_mode="luminance")
+    autumn_palette = extract_colors(image="nonspecific-season-palettes/autumn-palette.jpg", palette_size=144, sort_mode="luminance")
+
+
     for file in tqdm(files):
         # Get season
-        color_analysis_result = color_analysis(file)
-        season = parse_color_analysis_results(color_analysis_result)
+        season = color_analysis(file, spring_palette, summer_palette, winter_palette, autumn_palette)
 
         # Get the file name without extension, and excluding the path
         pid = int(Path(file).stem)
@@ -118,87 +107,65 @@ def add_new_item_to_db(col_vals):
         col_vals,
     )
     con.commit()
+    
 
+def color_analysis(image_path, spring, summer, winter, autumn):
+    palette = extract_colors(image=image_path, palette_size=2, sort_mode="frequency")
+    most_freq_color = palette.colors[0]
 
-def is_warm_cool(skin_tone):
-    r = skin_tone.rgb[0]
-    b = skin_tone.rgb[2]
-    rb_diff = r - b
-    if rb_diff <= warm_cool_rgb_cutoff:
-        is_warm = 0
-        return is_warm
+    # check for white background
+    if (most_freq_color.rgb == (255, 255, 255)):
+        most_freq_color = palette.colors[1]
+    
+    palette_distances = {}
+    palette_distances['spring'] = find_closest_color(most_freq_color, spring)
+    palette_distances['summer'] = find_closest_color(most_freq_color, summer)
+    palette_distances['winter'] = find_closest_color(most_freq_color, winter)
+    palette_distances['autumn'] = find_closest_color(most_freq_color, autumn)
+
+    if (palette_distances['spring'] == min(palette_distances.values())):
+        return 'spring'
+    elif (palette_distances['summer'] == min(palette_distances.values())):
+        return 'summer'
+    elif (palette_distances['winter'] == min(palette_distances.values())):
+        return 'winter'
     else:
-        is_warm = 1
-        return is_warm
+        return 'autumn'
 
+def find_closest_color(target_color, target_palette):
+    """
+    Finds the closest color to the target color for a target palette
 
-def is_high_low_contrast(skin_tone, hair_color, eye_color):
-    skin_tone = skin_tone.hsv
-    hair_color = hair_color.hsv
-    eye_color = eye_color.hsv
+    Parameters:
+        target_color (Color): The color to compare against.
+        target_palettes (Palette): The color palette to search
 
-    skin_v = skin_tone[2]
-    hair_v = hair_color[2]
-    eye_v = eye_color[2]
+    Returns:
+        Tuple[Color, Palette]: The closest color and the palette it belongs to.
+    """
+    def color_distance(c1, c2) -> float:
+        """
+        Calculates the Euclidean distance between two colors in RGB space.
+        
+        Parameters:
+            c1 (Color): The first color.
+            c2 (Color): The second color.
 
-    hair_diff = abs(skin_v - hair_v)
-    eye_diff = abs(skin_v - eye_v)
-    max_diff = max(hair_diff, eye_diff)
+        Returns:
+            float: The Euclidean distance between c1 and c2.
+        """
+        return np.linalg.norm(np.array(c1.rgb) - np.array(c2.rgb))
 
-    if skin_v < alg_switchpoint2:
-        if max_diff < contrast_alt2:
-            is_high_contrast = 0
-            return is_high_contrast
-        else:
-            is_high_contrast = 1
-            return is_high_contrast
-    elif skin_v <= alg_switchpoint:
-        if max_diff < contrast_alt:
-            is_high_contrast = 0
-            return is_high_contrast
-        else:
-            is_high_contrast = 1
-            return is_high_contrast
-    else:
-        if max_diff < contrast_wh:
-            is_high_contrast = 0
-            return is_high_contrast
-        else:
-            is_high_contrast = 1
-            return is_high_contrast
+    closest_color = None
+    min_distance = float('inf')
 
+    for color in target_palette.colors:
+        distance = color_distance(target_color, color)
+        if distance < min_distance:
+            min_distance = distance
+            closest_color = color
 
-def color_analysis(image_path):
-    palette = extract_colors(image=image_path, palette_size=3, sort_mode="luminance")
-
-    # palette.display()
-    skin_tone = palette.colors[2]
-    hair_color = palette.colors[1]
-    eye_color = palette.colors[0]
-
-    # print(skin_tone.rgb)
-    # print(hair_color.rgb)
-    # print(eye_color.rgb)
-
-    is_warm = is_warm_cool(skin_tone)
-    is_high_contrast = is_high_low_contrast(skin_tone, hair_color, eye_color)
-
-    result = [is_warm, is_high_contrast]
-    return result
-
-
-def parse_color_analysis_results(result):
-    warm_cool = result[0]
-    contrast = result[1]
-
-    if warm_cool == 0 and contrast == 0:
-        return "summer"
-    elif warm_cool == 0 and contrast == 1:
-        return "winter"
-    elif warm_cool == 1 and contrast == 1:
-        return "autumn"
-    else:
-        return "spring"
+    return min_distance
 
 
 def display_season_palette(season):
