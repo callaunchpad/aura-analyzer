@@ -14,7 +14,6 @@ python ../../color-correction/PyTorch/demo_single_image.py --i "../input-imgs/$I
 
 # Run facial detection
 python ../../face-detect/facedec/facedetect.py --i  "../intermediate-imgs/white-balanced.jpg"
-#SHOULD BE TEMP
 
 # Run color analysis
 python ../../color-analysis/color_analysis.py --i "../output-imgs/cropped.jpg"
