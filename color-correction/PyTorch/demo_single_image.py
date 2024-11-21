@@ -210,7 +210,7 @@ elif args.task.lower() == "awb":  # awb task
     out_awb = deep_wb(img, task=args.task.lower(), net_awb=net_awb, device=device, s=S)
     if tosave:
         result_awb = utls.to_image(out_awb)
-        result_awb.save(os.path.join(out_dir, "temp.png"))
+        result_awb.save(os.path.join(out_dir, "white-balanced.jpg"))
 
     if args.show:
         logging.info("Visualizing result for image: {}, close to continue ...".format(fn))
