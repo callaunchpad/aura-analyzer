@@ -2,9 +2,20 @@ import sys
 import os
 import requests
 from bs4 import BeautifulSoup
+import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.optim import lr_scheduler
+import torch.backends.cudnn as cudnn
+from torchvision import datasets, models, transforms
+from torch.utils.data import Dataset,DataLoader
+from torchvision.models import resnet18, ResNet18_Weights
+
+
 import numpy as np
 from Pylette import extract_colors
 import argparse
@@ -33,17 +44,34 @@ class ImageClassifier:
         ])
         model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
         return model
+    
+    def train(self,datapath="../../combined-demo/processed_images"):
+        train_set = tf.keras.utils.image_dataset_from_directory(datapath, image_size=(224, 224),batch_size=32,seed=123, validation_split=0.2,subset="training")
+        val_set = tf.keras.utils.image_dataset_from_directory(datapath, image_size=(224, 224),batch_size=32,seed=123, validation_split=0.2,subset="validation")
+        class_names = ['autumn','spring','summer','winter']
+
+        ds_train_images = np.concatenate([x.numpy() for x, y in train_set])
+        ds_train_labels = np.concatenate([y.numpy() for x, y in train_set])
+
+        ds_test_images = np.concatenate([x.numpy() for x, y in val_set])
+        ds_test_labels = np.concatenate([y.numpy() for x, y in val_set])
+
+        self.model.compile(optimizer='adam',loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+        self.model.fit(ds_train_images, ds_train_labels)
+        test_loss, test_acc = self.model.evaluate(ds_test_images, ds_test_labels, verbose=2)
+        print('\nTest accuracy:', test_acc)
 
     def predict_season(self, image_path):
         img = load_img(image_path, target_size=self.input_shape[:2])
         img_array = img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
         img_array /= 255.0
-
+        self.train()
         predictions = self.model.predict(img_array)
         predicted_class = np.argmax(predictions[0])
         season = self.class_labels[predicted_class]
-        return season
+        return season    
+    
 
 # Scrape images for training dataset
 def scrape_and_download_images(target_dir="season-palettes"):
@@ -69,6 +97,7 @@ def scrape_and_download_images(target_dir="season-palettes"):
                 print(f"Downloaded {img_name} to {season_dir}")
             except Exception as e:
                 print(f"Failed to download {img_url}: {e}")
+
 
 # Display the color palette for the predicted season
 def display_season_palette(season):
