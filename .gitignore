@@ -3,9 +3,10 @@
 *.py[cod]
 
 # tester output images
-combined-demo/intermediate-imgs/*.*
-combined-demo/output-imgs/*.*
+combined_demo/intermediate-imgs/*.*
+combined_demo/output-imgs/*.*
 
 # outfit dataset
-color-analysis/fashion-dataset-small/*.*
+color_analysis/fashion-dataset-small/*.*
 *.csv
+node_modules

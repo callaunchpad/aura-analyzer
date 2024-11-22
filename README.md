@@ -38,9 +38,9 @@ pip install -r requirements.txt
 
 ## run demo
 
-1. navigate to combined-demo/scripts
+1. navigate to combined_demo/scripts
 ```bash
-cd combined-demo/scripts
+cd combined_demo/scripts
 ```
 2. run the following command, replacing <image-name.jpg> with an image of your choice (ensure that you add it to the input-imgs folder first)
 ```bash
@@ -64,7 +64,7 @@ pip install -r requirements.txt
 
 conda install -c nvidia cuda-python
 
-cd combined-demo/scripts
+cd combined_demo/scripts
 
 chmod +x ./run_demo.sh
 
