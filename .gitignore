@@ -5,3 +5,7 @@
 # tester output images
 combined-demo/intermediate-imgs/*.*
 combined-demo/output-imgs/*.*
+
+# outfit dataset
+color-analysis/fashion-dataset-small/*.*
+*.csv
