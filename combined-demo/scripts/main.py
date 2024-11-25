@@ -12,6 +12,7 @@ import subprocess
 class AuraRequest(BaseModel):
     outfit_style: Literal['Casual', 'Ethnic', 'Formal', 'Home', 'Party', 'Smart Casual', 'Sports', 'Travel'] | None
     gender_expression: Literal['Boys', 'Girls', 'Men', 'Unisex', 'Women']
+    colorSeason: Literal['autumn', 'winter', 'spring', 'summer']
     num_outfits: int = 1
 
 
@@ -58,51 +59,70 @@ def on_startup():
     create_db_and_tables()
 
 def run_demo(filename: str):
-    cmd = "./run_demo.sh " + filename
-    os.system(cmd)
+    result = subprocess.run(["./run_demo.sh", filename], capture_output=True)
+    # print(result)
+    output = result.stdout
+    str_output = str(output)
+    # print("DEBUG: " + str_output)
+    index = str_output.index("your color season is")
+    color_season = str_output[index+len("your color season is "):-3]
     print("Success")
-    
-# Upload file endpoint
+    print(color_season)
+    return color_season
+
+# Get color season
 @app.post("/aura_analyze/")
 async def aura_analyze(
-    session: SessionDep,
-    # file: Annotated[UploadFile, File()],
-    aura_request: Annotated[AuraRequest, Form()]
+    file: Annotated[UploadFile, File()]
 ):
-    # name = "../input-imgs/input.jpg"
-    # contents = file.file.read()
-    # im = Image.open(BytesIO(contents))
-    # im.save(name)
-    # run_demo(name)
+    name = "../input-imgs/input.jpg"
+    contents = file.file.read()
+    im = Image.open(BytesIO(contents)).convert("RGB")
+    im.save(name)
+    color_season = run_demo(name)
 
-    # # output_filename = "combined-demo/output-imgs/" + file.file
-    # redbox_file = "../output-imgs/redbox.jpg"
-    # cropped_file = "../output-imgs/cropped.jpg"
-    # palette = "../output-imgs/your-palette.jpg"
-    # # return FileResponse(redbox_file)
-    # # return {"redbox_image": FileResponse(redbox_file), "cropped_image": cropped_file, "color_analysis": FileResponse(palette)}
-    # # return {"filename": file.filename, "content": contents}
-    colorSeason = "autumn"
+    return color_season
 
-    tops = session.exec(select(Fashion).where(Fashion.colorSeason == colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.usage == aura_request.outfit_style).where(Fashion.masterCategory == "Apparel").where(Fashion.subCategory == "Topwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
+@app.get("/aura_analyze/redbox")
+async def get_redbox():
+    redbox_file = "../output-imgs/redbox.jpg"
+    return FileResponse(redbox_file, media_type="image/jpg")
+
+@app.get("/aura_analyze/cropped")
+async def get_cropped():
+    cropped_file = "../output-imgs/cropped.jpg"
+    return FileResponse(cropped_file, media_type="image/jpg")
+
+@app.get("/aura_analyze/palette")
+async def get_palette():
+    palette = "../output-imgs/your-palette.jpg"
+    return FileResponse(palette, media_type="image/jpg")
+
+# Generate outfits
+@app.post("/generate-outfit")
+async def generate_outfit(
+    session: SessionDep,
+    aura_request: AuraRequest
+):
+    tops = session.exec(select(Fashion).where(Fashion.colorSeason == aura_request.colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.usage == aura_request.outfit_style).where(Fashion.masterCategory == "Apparel").where(Fashion.subCategory == "Topwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
     if not tops:
-        tops = session.exec(select(Fashion).where(Fashion.colorSeason == colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.usage == "Casual").where(Fashion.masterCategory == "Apparel").where(Fashion.subCategory == "Topwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
+        tops = session.exec(select(Fashion).where(Fashion.colorSeason == aura_request.colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.usage == "Casual").where(Fashion.masterCategory == "Apparel").where(Fashion.subCategory == "Topwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
         if not tops:
             raise HTTPException(status_code=404, detail="No matching tops found")
     
-    bottoms = session.exec(select(Fashion).where(Fashion.colorSeason == colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.usage == aura_request.outfit_style).where(Fashion.masterCategory == "Apparel").where(Fashion.subCategory == "Bottomwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
+    bottoms = session.exec(select(Fashion).where(Fashion.colorSeason == aura_request.colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.usage == aura_request.outfit_style).where(Fashion.masterCategory == "Apparel").where(Fashion.subCategory == "Bottomwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
     if not bottoms:
-        bottoms = session.exec(select(Fashion).where(Fashion.colorSeason == colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.masterCategory == "Apparel").where(Fashion.subCategory == "Bottomwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
+        bottoms = session.exec(select(Fashion).where(Fashion.colorSeason == aura_request.colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.masterCategory == "Apparel").where(Fashion.subCategory == "Bottomwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
         if not bottoms:
             raise HTTPException(status_code=404, detail="No matching bottoms found")
     
-    accessories = session.exec(select(Fashion).where(Fashion.colorSeason == colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.masterCategory == "Accessories").order_by(func.random()).limit(aura_request.num_outfits)).all()
+    accessories = session.exec(select(Fashion).where(Fashion.colorSeason == aura_request.colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.masterCategory == "Accessories").order_by(func.random()).limit(aura_request.num_outfits)).all()
     if not accessories:
-        accessories = session.exec(select(Fashion).where(Fashion.colorSeason == colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.masterCategory == "Accessories").order_by(func.random()).limit(aura_request.num_outfits)).all()
+        accessories = session.exec(select(Fashion).where(Fashion.colorSeason == aura_request.colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.masterCategory == "Accessories").order_by(func.random()).limit(aura_request.num_outfits)).all()
         if not accessories:
             raise HTTPException(status_code=404, detail="No matching accessories found")
 
-    return [{"colorSeason": colorSeason}, tops, bottoms, accessories]
+    return [tops, bottoms, accessories]
 
 # return image of item that matches id
 @app.get("/items/{image_id}")
