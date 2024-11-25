@@ -23,6 +23,8 @@ we will take this value by finding the hsv of skin tone and taking the v value
 
 """
 from Pylette import extract_colors
+from PIL import Image
+import numpy as np
 
 warm_cool_rgb_cutoff = 48 # if <= cool, else warm
 alg_switchpoint = 62 # if v of skin <= switch to modified contrast alg
@@ -122,6 +124,26 @@ def display_season_palette(season):
     
     palette.display(save_to_file=True, filename="../output-imgs/your-palette")
     return
+
+def save_season_palette(season):
+    if (season == "summer"):
+        palette = extract_colors(image='../../color-analysis/season-palettes/cool-summer.JPG', palette_size=48)
+    elif (season == "winter"):
+        palette = extract_colors(image='../../color-analysis/season-palettes/cool-winter.JPG', palette_size=48)
+    elif (season == "autumn"):
+        palette = extract_colors(image='../../color-analysis/season-palettes/warm-autumn.JPG', palette_size=48)
+    else:
+        palette = extract_colors(image='../../color-analysis/season-palettes/warm-spring.JPG', palette_size=48)
+
+    w, h = 48, 48
+    img = Image.new("RGB", size=(w * palette.number_of_colors, h))
+    arr = np.asarray(img).copy()
+    for i in range(palette.number_of_colors):
+        c = palette.colors[i]
+        arr[:, i * h : (i + 1) * h, :] = c.rgb
+    img = Image.fromarray(arr, "RGB")
+
+    img.save(f"../output-imgs/your-palette.jpg")
     
 # python script code
 # import argparser
@@ -143,4 +165,5 @@ season = parse_color_analysis_results(color_analysis_result)
 print(f'your color season is {season}')
 
 # display color palette
-display_season_palette(season)
+# display_season_palette(season)
+save_season_palette(season)
