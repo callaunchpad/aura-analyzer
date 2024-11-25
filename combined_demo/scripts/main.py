@@ -30,11 +30,10 @@ class Fashion(SQLModel, table=True):
     colorSeason: str = Field(default=None, index=True)
 
 # where images are located
-data_path = "../../color_analysis/fashion-dataset-small/"
-# data_path = "../../data/myntradataset/images/"
+data_path = "../../color_analysis/fashion-dataset-small/images"
 
 # start database
-sqlite_file_name = "../../color-analysis/small-fashion-dataset.db"
+sqlite_file_name = "../../color_analysis/small-fashion-dataset.db"
 # sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 connect_args = {"check_same_thread": False}
@@ -73,7 +72,14 @@ def run_demo(filename: str):
 @app.post("/aura_analyze/")
 async def aura_analyze(
     file: Annotated[UploadFile, File()]
-):
+):  
+    if not os.path.exists("../input-imgs"):
+        os.makedirs("../input-imgs")
+    if not os.path.exists("../intermediate-imgs"):
+        os.makedirs("../intermediate-imgs")
+    if not os.path.exists("../output-imgs"):
+        os.makedirs("../output-imgs")
+
     name = "../input-imgs/input.jpg"
     contents = file.file.read()
     im = Image.open(BytesIO(contents)).convert("RGB")
@@ -84,18 +90,27 @@ async def aura_analyze(
 
 @app.get("/aura_analyze/redbox")
 async def get_redbox():
-    redbox_file = "../output-imgs/redbox.jpg"
-    return FileResponse(redbox_file, media_type="image/jpg")
+    redbox_path = "../output-imgs/redbox.jpg"
+    if not os.path.exists(redbox_path):
+        raise HTTPException(status_code=404, detail=f"Redbox not found")
+
+    return FileResponse(redbox_path, media_type="image/jpg")
 
 @app.get("/aura_analyze/cropped")
 async def get_cropped():
-    cropped_file = "../output-imgs/cropped.jpg"
-    return FileResponse(cropped_file, media_type="image/jpg")
+    cropped_path = "../output-imgs/cropped.jpg"
+    if not os.path.exists(cropped_path):
+        raise HTTPException(status_code=404, detail=f"Cropped image not found")
+    
+    return FileResponse(cropped_path, media_type="image/jpg")
 
 @app.get("/aura_analyze/palette")
 async def get_palette():
-    palette = "../output-imgs/your-palette.jpg"
-    return FileResponse(palette, media_type="image/jpg")
+    palette_path = "../output-imgs/your-palette.jpg"
+    if not os.path.exists(palette_path):
+        raise HTTPException(status_code=404, detail=f"Palette not found")
+    
+    return FileResponse(palette_path, media_type="image/jpg")
 
 # Generate outfits
 @app.post("/generate-outfit")

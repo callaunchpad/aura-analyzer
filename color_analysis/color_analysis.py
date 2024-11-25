@@ -127,13 +127,13 @@ def display_season_palette(season):
 
 def save_season_palette(season):
     if (season == "summer"):
-        palette = extract_colors(image='../../color-analysis/season-palettes/cool-summer.JPG', palette_size=48)
+        palette = extract_colors(image='../../color_analysis/season-palettes/cool-summer.JPG', palette_size=48)
     elif (season == "winter"):
-        palette = extract_colors(image='../../color-analysis/season-palettes/cool-winter.JPG', palette_size=48)
+        palette = extract_colors(image='../../color_analysis/season-palettes/cool-winter.JPG', palette_size=48)
     elif (season == "autumn"):
-        palette = extract_colors(image='../../color-analysis/season-palettes/warm-autumn.JPG', palette_size=48)
+        palette = extract_colors(image='../../color_analysis/season-palettes/warm-autumn.JPG', palette_size=48)
     else:
-        palette = extract_colors(image='../../color-analysis/season-palettes/warm-spring.JPG', palette_size=48)
+        palette = extract_colors(image='../../color_analysis/season-palettes/warm-spring.JPG', palette_size=48)
 
     w, h = 48, 48
     img = Image.new("RGB", size=(w * palette.number_of_colors, h))

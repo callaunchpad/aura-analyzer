@@ -2,10 +2,6 @@
 */__pycache__/
 *.py[cod]
 
-# tester output images
-combined_demo/intermediate-imgs/*.*
-combined_demo/output-imgs/*.*
-
 # outfit dataset
 color_analysis/fashion-dataset-small/*.*
 *.csv
