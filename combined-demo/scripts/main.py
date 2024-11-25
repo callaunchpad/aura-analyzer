@@ -1,23 +1,61 @@
-from typing import Union
-from typing import Annotated
+from typing import Annotated, Literal
 from fastapi.responses import FileResponse
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, HTTPException, Depends, Form
 from pydantic import BaseModel
 from PIL import Image
 from io import BytesIO
 import os
-
-app = FastAPI()
+from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlalchemy import func
+import subprocess
 
 class AuraRequest(BaseModel):
-    input_image: Annotated[UploadFile, File(description="A file read as UploadFile")]
-    outfit_style: str
-    gender_expression: str
-    current_weather: str
+    outfit_style: Literal['Casual', 'Ethnic', 'Formal', 'Home', 'Party', 'Smart Casual', 'Sports', 'Travel'] | None
+    gender_expression: Literal['Boys', 'Girls', 'Men', 'Unisex', 'Women']
+    num_outfits: int = 1
+
+
+class Fashion(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    gender: str = Field(index=True)
+    masterCategory: str = Field(index=True)
+    subCategory: str = Field(index=True)
+    articleType: str = Field(index=True)
+    baseColour: str
+    season: str
+    year: str
+    usage: str
+    productDisplayName: str
+    colorSeason: str = Field(default=None, index=True)
+
+# where images are located
+data_path = "../../data/myntradataset/images/"
+
+# start database
+sqlite_file_name = "../../color-analysis/small-fashion-dataset.db"
+# sqlite_file_name = "database.db"
+sqlite_url = f"sqlite:///{sqlite_file_name}"
+connect_args = {"check_same_thread": False}
+engine = create_engine(sqlite_url, connect_args=connect_args)
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+SessionDep = Annotated[Session, Depends(get_session)]
+
+app = FastAPI()
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
 
 def run_demo(filename: str):
     cmd = "./run_demo.sh " + filename
@@ -25,21 +63,56 @@ def run_demo(filename: str):
     print("Success")
     
 # Upload file endpoint
-@app.post("/uploadfile/")
-async def create_upload_file(
-    file: Annotated[UploadFile, File(description="A file read as UploadFile")],
+@app.post("/aura_analyze/")
+async def aura_analyze(
+    session: SessionDep,
+    # file: Annotated[UploadFile, File()],
+    aura_request: Annotated[AuraRequest, Form()]
 ):
-    name = "../input-imgs/input.jpg"
-    contents = file.file.read()
-    im = Image.open(BytesIO(contents))
-    im.save(name)
-    run_demo(name)
+    # name = "../input-imgs/input.jpg"
+    # contents = file.file.read()
+    # im = Image.open(BytesIO(contents))
+    # im.save(name)
+    # run_demo(name)
 
+    # # output_filename = "combined-demo/output-imgs/" + file.file
+    # redbox_file = "../output-imgs/redbox.jpg"
+    # cropped_file = "../output-imgs/cropped.jpg"
+    # palette = "../output-imgs/your-palette.jpg"
+    # # return FileResponse(redbox_file)
+    # # return {"redbox_image": FileResponse(redbox_file), "cropped_image": cropped_file, "color_analysis": FileResponse(palette)}
+    # # return {"filename": file.filename, "content": contents}
+    colorSeason = "autumn"
 
-    # output_filename = "combined-demo/output-imgs/" + file.file
-    redbox_file = "../output-imgs/redbox.jpg"
-    cropped_file = "../output-imgs/cropped.jpg"
-    palette = "../output-imgs/your-palette.jpg"
-    return FileResponse(redbox_file)
-    # return {"redbox_image": FileResponse(redbox_file), "cropped_image": cropped_file, "color_analysis": FileResponse(palette)}
-    # return {"filename": file.filename, "content": contents}
+    tops = session.exec(select(Fashion).where(Fashion.colorSeason == colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.usage == aura_request.outfit_style).where(Fashion.masterCategory == "Apparel").where(Fashion.subCategory == "Topwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
+    if not tops:
+        tops = session.exec(select(Fashion).where(Fashion.colorSeason == colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.usage == "Casual").where(Fashion.masterCategory == "Apparel").where(Fashion.subCategory == "Topwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
+        if not tops:
+            raise HTTPException(status_code=404, detail="No matching tops found")
+    
+    bottoms = session.exec(select(Fashion).where(Fashion.colorSeason == colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.usage == aura_request.outfit_style).where(Fashion.masterCategory == "Apparel").where(Fashion.subCategory == "Bottomwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
+    if not bottoms:
+        bottoms = session.exec(select(Fashion).where(Fashion.colorSeason == colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.masterCategory == "Apparel").where(Fashion.subCategory == "Bottomwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
+        if not bottoms:
+            raise HTTPException(status_code=404, detail="No matching bottoms found")
+    
+    accessories = session.exec(select(Fashion).where(Fashion.colorSeason == colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.masterCategory == "Accessories").order_by(func.random()).limit(aura_request.num_outfits)).all()
+    if not accessories:
+        accessories = session.exec(select(Fashion).where(Fashion.colorSeason == colorSeason).where(Fashion.gender == aura_request.gender_expression).where(Fashion.masterCategory == "Accessories").order_by(func.random()).limit(aura_request.num_outfits)).all()
+        if not accessories:
+            raise HTTPException(status_code=404, detail="No matching accessories found")
+
+    return [{"colorSeason": colorSeason}, tops, bottoms, accessories]
+
+# return image of item that matches id
+@app.get("/items/{image_id}")
+async def get_item_image(
+    session: SessionDep,
+    image_id: int
+):
+    if session.exec(select(Fashion).where(Fashion.id==image_id)).first() is None:
+        raise HTTPException(status_code=404, detail=f"Item {image_id} does not exist")
+    if not os.path.exists(f"{data_path}/{image_id}.jpg"):
+        raise HTTPException(status_code=404, detail=f"Image for item {image_id} not found")
+    
+    return FileResponse(f"{data_path}/{image_id}.jpg", media_type="image/jpg")
