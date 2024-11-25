@@ -60,10 +60,8 @@ def on_startup():
 
 def run_demo(filename: str):
     result = subprocess.run(["./run_demo.sh", filename], capture_output=True)
-    # print(result)
     output = result.stdout
     str_output = str(output)
-    # print("DEBUG: " + str_output)
     index = str_output.index("your color season is")
     color_season = str_output[index+len("your color season is "):-3]
     print("Success")
