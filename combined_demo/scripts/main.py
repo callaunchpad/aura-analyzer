@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from PIL import Image
 from io import BytesIO
 import os
+import subprocess
 
 app = FastAPI()
 
@@ -21,7 +22,8 @@ def read_root():
 
 def run_demo(filename: str):
     cmd = "./run_demo.sh " + filename
-    os.system(cmd)
+    subprocess.call(["./run_demo.sh", filename])
+    # os.system(cmd)
     print("Success")
     
 # Upload file endpoint
