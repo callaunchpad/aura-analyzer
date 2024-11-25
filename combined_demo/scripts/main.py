@@ -21,10 +21,14 @@ def read_root():
     return {"Hello": "World"}
 
 def run_demo(filename: str):
-    cmd = "./run_demo.sh " + filename
-    subprocess.call(["./run_demo.sh", filename])
-    # os.system(cmd)
+    result = subprocess.run(["./run_demo.sh", filename], capture_output=True)
+    output = result.stdout
+    str_output = str(output)
+    index = str_output.index("your color season is")
+    color_season = str_output[index+len("your color season is "):-3]
     print("Success")
+    print(color_season)
+    return color_season
     
 # Upload file endpoint
 @app.post("/uploadfile/")
@@ -35,13 +39,13 @@ async def create_upload_file(
     contents = file.file.read()
     im = Image.open(BytesIO(contents))
     im.save(name)
-    run_demo(name)
+    color_season = run_demo(name)
 
 
-    # output_filename = "combined_demo/output-imgs/" + file.file
+    # When returning an image do the following commented return
     redbox_file = "../output-imgs/redbox.jpg"
     cropped_file = "../output-imgs/cropped.jpg"
     palette = "../output-imgs/your-palette.jpg"
-    return FileResponse(redbox_file)
-    # return {"redbox_image": FileResponse(redbox_file), "cropped_image": cropped_file, "color_analysis": FileResponse(palette)}
-    # return {"filename": file.filename, "content": contents}
+     # return FileResponse(redbox_file)
+
+    return color_season
