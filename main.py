@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from PIL import Image
 from io import BytesIO
 import os
-from sqlmodel import Field, Session, SQLModel, ARRAY, create_engine, select
+from sqlmodel import Field, Session, SQLModel, or_, create_engine, select
 from sqlalchemy import func
 import subprocess
 
@@ -126,34 +126,34 @@ async def get_palette():
     return FileResponse(palette_path, media_type="image/jpg")
 
 # Generate outfits
-@app.post("/generate-outfit")
+@app.post("/generate_outfit")
 async def generate_outfit(
     session: SessionDep,
     aura_request: AuraRequest
 ):
     # Get tops
-    tops = session.exec(select(Items).where(Items.ColorSeason == aura_request.ColorSeason).where(Items.Department == aura_request.Department).where(Items.MasterCategory == "tops").order_by(func.random()).limit(aura_request.num_outfits)).all()
+    tops = session.exec(select(Items).where(Items.ColorSeason == aura_request.ColorSeason).where(Items.Department == aura_request.Department).where(or_(Items.MasterCategory == "tops", Items.MasterCategory == "womens_tops")).order_by(func.random()).limit(aura_request.num_outfits)).all()
     if not tops:
         raise HTTPException(status_code=404, detail="No matching tops found")
     
     # Get bottoms
-    bottoms = session.exec(select(Items).where(Items.ColorSeason == aura_request.ColorSeason).where(Items.Department == aura_request.Department).where(Items.MasterCategory == "bottoms").order_by(func.random()).limit(aura_request.num_outfits)).all()
+    bottoms = session.exec(select(Items).where(Items.ColorSeason == aura_request.ColorSeason).where(Items.Department == aura_request.Department).where(or_(Items.MasterCategory == "bottoms", Items.MasterCategory == "womens_bottoms")).order_by(func.random()).limit(aura_request.num_outfits)).all()
     if not bottoms:
         raise HTTPException(status_code=404, detail="No matching bottoms found")
     
     # Get shoes
-    shoes = session.exec(select(Items).where(Items.ColorSeason == aura_request.ColorSeason).where(Items.Department == aura_request.Department).where(Items.MasterCategory == "footwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
+    shoes = session.exec(select(Items).where(Items.ColorSeason == aura_request.ColorSeason).where(Items.Department == aura_request.Department).where(or_(Items.MasterCategory == "footwear", Items.MasterCategory == "womens_footwear")).order_by(func.random()).limit(aura_request.num_outfits)).all()
     if not bottoms:
         raise HTTPException(status_code=404, detail="No matching shoes found")
     
     # Get outerwear
-    outerwear = session.exec(select(Items).where(Items.ColorSeason == aura_request.ColorSeason).where(Items.Department == aura_request.Department).where(Items.MasterCategory == "outerwear").order_by(func.random()).limit(aura_request.num_outfits)).all()
+    outerwear = session.exec(select(Items).where(Items.ColorSeason == aura_request.ColorSeason).where(Items.Department == aura_request.Department).where(or_(Items.MasterCategory == "outerwear", Items.MasterCategory == "outerwear")).order_by(func.random()).limit(aura_request.num_outfits)).all()
     if not outerwear:
         print("No matching outerwear found")
         # raise HTTPException(status_code=404, detail="No matching outerwear found")
     
     # Get accessories
-    accessories = session.exec(select(Items).where(Items.ColorSeason == aura_request.ColorSeason).where(Items.Department == aura_request.Department).where(Items.MasterCategory == "accessories").order_by(func.random()).limit(aura_request.num_outfits)).all()
+    accessories = session.exec(select(Items).where(Items.ColorSeason == aura_request.ColorSeason).where(Items.Department == aura_request.Department).where(or_(Items.MasterCategory == "accessories", Items.MasterCategory == "womens_accessories")).order_by(func.random()).limit(aura_request.num_outfits)).all()
     if not bottoms:
         print("No matching accessories found")
         # raise HTTPException(status_code=404, detail="No matching outerwear found")
