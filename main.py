@@ -30,11 +30,10 @@ class Fashion(SQLModel, table=True):
     colorSeason: str = Field(default=None, index=True)
 
 # where images are located
-# data_path = "../../color_analysis/fashion-dataset-small/images"
-data_path = "../../color_analysis/grailed-dataset/images"
+data_path = "color_analysis/fashion-dataset-small/images"
 
 # start database
-sqlite_file_name = "../../color_analysis/grailed-dataset.db"
+sqlite_file_name = "color_analysis/small-fashion-dataset.db"
 # sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 connect_args = {"check_same_thread": False}
@@ -60,13 +59,14 @@ def on_startup():
     create_db_and_tables()
 
 def run_demo(filename: str):
-    result = subprocess.run(["./run_demo.sh", filename], capture_output=True)
+    script_path = os.path.join(os.path.dirname(__file__),'run_demo.sh')
+    result = subprocess.run([script_path, filename], capture_output=True)
     output = result.stdout
     str_output = str(output)
     index = str_output.index("your color season is")
     color_season = str_output[index+len("your color season is "):-3]
-    print("Success")
-    print(color_season)
+    # print("Success")
+    # print(color_season)
     return color_season
 
 # Get color season
@@ -74,24 +74,24 @@ def run_demo(filename: str):
 async def aura_analyze(
     file: Annotated[UploadFile, File()]
 ):  
-    if not os.path.exists("../input-imgs"):
-        os.makedirs("../input-imgs")
-    if not os.path.exists("../intermediate-imgs"):
-        os.makedirs("../intermediate-imgs")
-    if not os.path.exists("../output-imgs"):
-        os.makedirs("../output-imgs")
+    if not os.path.exists("combined_demo/input-imgs"):
+        os.makedirs("combined_demo/input-imgs")
+    if not os.path.exists("combined_demo/intermediate-imgs"):
+        os.makedirs("combined_demo/intermediate-imgs")
+    if not os.path.exists("combined_demo/output-imgs"):
+        os.makedirs("combined_demo/output-imgs")
 
-    name = "../input-imgs/input.jpg"
+    name = "input.jpg"
     contents = file.file.read()
     im = Image.open(BytesIO(contents)).convert("RGB")
-    im.save(name)
+    im.save(f"combined_demo/input-imgs/{name}")
     color_season = run_demo(name)
 
     return color_season
 
 @app.get("/aura_analyze/redbox")
 async def get_redbox():
-    redbox_path = "../output-imgs/redbox.jpg"
+    redbox_path = "combined_demo/output-imgs/redbox.jpg"
     if not os.path.exists(redbox_path):
         raise HTTPException(status_code=404, detail=f"Redbox not found")
 
@@ -99,7 +99,7 @@ async def get_redbox():
 
 @app.get("/aura_analyze/cropped")
 async def get_cropped():
-    cropped_path = "../output-imgs/cropped.jpg"
+    cropped_path = "combined_demo/output-imgs/cropped.jpg"
     if not os.path.exists(cropped_path):
         raise HTTPException(status_code=404, detail=f"Cropped image not found")
     
@@ -107,7 +107,7 @@ async def get_cropped():
 
 @app.get("/aura_analyze/palette")
 async def get_palette():
-    palette_path = "../output-imgs/your-palette.jpg"
+    palette_path = "combined_demo/output-imgs/your-palette.jpg"
     if not os.path.exists(palette_path):
         raise HTTPException(status_code=404, detail=f"Palette not found")
     
