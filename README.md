@@ -38,11 +38,7 @@ pip install -r requirements.txt
 
 ## run demo
 
-1. navigate to combined_demo/scripts
-```bash
-cd combined_demo/scripts
-```
-2. run the following command, replacing <image-name.jpg> with an image of your choice (ensure that you add it to the input-imgs folder first)
+1. run the following command, replacing <image-name.jpg> with an image of your choice (ensure that you add it to the input-imgs folder first)
 ```bash
 ./run_demo.sh image-name.jpg
 ```
@@ -63,8 +59,6 @@ source activate aura-analyzer
 pip install -r requirements.txt
 
 conda install -c nvidia cuda-python
-
-cd combined_demo/scripts
 
 chmod +x ./run_demo.sh
 
