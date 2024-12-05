@@ -6,6 +6,9 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
+from tensorflow.keras import datasets, layers, models
+
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -25,10 +28,11 @@ class ImageClassifier:
     def __init__(self, input_shape=(224, 224, 3), num_classes=4):
         self.input_shape = input_shape
         self.num_classes = num_classes
-        self.class_labels = ["Bright Spring", "True Spring", "Light Spring", "Warm Autumn"]
+        self.class_labels = ["Spring", "Winter", "Autumn", "Summer"]
         self.model = self._create_model()
 
     def _create_model(self):
+
         model = Sequential([
             Input(shape=self.input_shape),
             Conv2D(32, (3, 3), activation='relu'),
@@ -42,21 +46,22 @@ class ImageClassifier:
             Dropout(0.5),
             Dense(self.num_classes, activation='softmax')
         ])
+
         model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
         return model
+    
     
     def train(self,datapath="../../combined-demo/processed_images"):
         train_set = tf.keras.utils.image_dataset_from_directory(datapath, image_size=(224, 224),batch_size=32,seed=123, validation_split=0.2,subset="training")
         val_set = tf.keras.utils.image_dataset_from_directory(datapath, image_size=(224, 224),batch_size=32,seed=123, validation_split=0.2,subset="validation")
         class_names = ['autumn','spring','summer','winter']
-
+    
         ds_train_images = np.concatenate([x.numpy() for x, y in train_set])
         ds_train_labels = np.concatenate([y.numpy() for x, y in train_set])
 
         ds_test_images = np.concatenate([x.numpy() for x, y in val_set])
         ds_test_labels = np.concatenate([y.numpy() for x, y in val_set])
 
-        self.model.compile(optimizer='adam',loss='sparse_categorical_crossentropy',metrics=['accuracy'])
         self.model.fit(ds_train_images, ds_train_labels)
         test_loss, test_acc = self.model.evaluate(ds_test_images, ds_test_labels, verbose=2)
         print('\nTest accuracy:', test_acc)
@@ -102,18 +107,10 @@ def scrape_and_download_images(target_dir="season-palettes"):
 # Display the color palette for the predicted season
 def display_season_palette(season):
     palette_file = {
-        "Bright Spring": '../../color-analysis/season-palettes/warm-spring.JPG',
-        "True Spring": '../../color-analysis/season-palettes/warm-spring.JPG',
-        "Light Spring": '../../color-analysis/season-palettes/light-spring.JPG',
-        "Warm Autumn": '../../color-analysis/season-palettes/warm-autumn.JPG',
-        "Soft Autumn": '../../color-analysis/season-palettes/soft-autumn.JPG',
-        "Deep Autumn": '../../color-analysis/season-palettes/deep-autumn.JPG',
-        "Clear Winter": '../../color-analysis/season-palettes/clear-winter.JPG',
-        "Cool Winter": '../../color-analysis/season-palettes/cool-winter.JPG',
-        "Deep Winter": '../../color-analysis/season-palettes/deep-winter.JPG',
-        "Light Summer": '../../color-analysis/season-palettes/light-summer.JPG',
-        "Cool Summer": '../../color-analysis/season-palettes/cool-summer.JPG',
-        "Soft Summer": '../../color-analysis/season-palettes/soft-summer.JPG'
+        "Spring": '../../color-analysis/season-palettes/warm-spring.JPG',
+        "Autumn": '../../color-analysis/season-palettes/warm-autumn.JPG',
+        "Winter": '../../color-analysis/season-palettes/clear-winter.JPG',
+        "Summer": '../../color-analysis/season-palettes/light-summer.JPG',
     }
 
     if season in palette_file:
