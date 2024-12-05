@@ -30,10 +30,11 @@ class Fashion(SQLModel, table=True):
     colorSeason: str = Field(default=None, index=True)
 
 # where images are located
-data_path = "../../color_analysis/fashion-dataset-small/images"
+# data_path = "../../color_analysis/fashion-dataset-small/images"
+data_path = "../../color_analysis/grailed-dataset/images"
 
 # start database
-sqlite_file_name = "../../color_analysis/small-fashion-dataset.db"
+sqlite_file_name = "../../color_analysis/grailed-dataset.db"
 # sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 connect_args = {"check_same_thread": False}

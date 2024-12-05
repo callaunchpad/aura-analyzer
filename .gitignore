@@ -4,5 +4,6 @@
 
 # outfit dataset
 color_analysis/fashion-dataset-small/*.*
+color_analysis/grailed-dataset/*
 *.csv
 node_modules

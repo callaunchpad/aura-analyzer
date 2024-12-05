@@ -26,10 +26,9 @@ from tqdm import tqdm
 import numpy as np
 from typing import Tuple
 
-con = sqlite3.connect("small-fashion-dataset.db")
+import argparse
 
-
-def setup_fashion_table():
+def setup_fashion_table(con):
     cur = con.cursor()
     cur.execute(
         """CREATE TABLE IF NOT EXISTS fashion(
@@ -51,7 +50,6 @@ def setup_fashion_table():
 def run_color_analysis(dir: str, styles_dir):
     # retrieve the styles_dir
     style_table = pd.read_csv(styles_dir, index_col=0, on_bad_lines="warn")
-
     # get all files in dir
     files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
 
@@ -60,7 +58,6 @@ def run_color_analysis(dir: str, styles_dir):
     spring_palette = extract_colors(image="nonspecific-season-palettes/spring-palette.jpg", palette_size=144, sort_mode="luminance")
     winter_palette = extract_colors(image="nonspecific-season-palettes/winter-palette.jpg", palette_size=144, sort_mode="luminance")
     autumn_palette = extract_colors(image="nonspecific-season-palettes/autumn-palette.jpg", palette_size=144, sort_mode="luminance")
-
 
     for file in tqdm(files):
         # Get season
@@ -98,12 +95,26 @@ def retr_addn_info(pid: str, style_table):
     )
     return col_vals
 
-
+ 
 def add_new_item_to_db(col_vals):
     cur = con.cursor()
+    # change to upsert
     cur.execute(
-        """INSERT INTO fashion(id, gender, masterCategory, subCategory, articleType, baseColour, season, year, usage, productDisplayName, colorSeason)
-        VALUES(?,?,?,?,?,?,?,?,?,?,?)""",
+        """
+        INSERT INTO fashion(id, gender, masterCategory, subCategory, articleType, baseColour, season, year, usage, productDisplayName, colorSeason)
+        VALUES(?,?,?,?,?,?,?,?,?,?,?) 
+        ON CONFLICT(id) DO UPDATE SET
+            gender=excluded.gender,
+            masterCategory=excluded.masterCategory,
+            subCategory=excluded.subCategory,
+            articleType=excluded.articleType,
+            baseColour=excluded.baseColour,
+            season=excluded.season,
+            year=excluded.year,
+            usage=excluded.usage,
+            productDisplayName=excluded.productDisplayName,
+            colorSeason=excluded.colorSeason
+        """,
         col_vals,
     )
     con.commit()
@@ -112,9 +123,9 @@ def add_new_item_to_db(col_vals):
 def color_analysis(image_path, spring, summer, winter, autumn):
     palette = extract_colors(image=image_path, palette_size=2, sort_mode="frequency")
     most_freq_color = palette.colors[0]
-
+    
     # check for white background
-    if (most_freq_color.rgb == (255, 255, 255)):
+    if ((most_freq_color.rgb == np.array([255, 255, 255])).all()):
         most_freq_color = palette.colors[1]
     
     palette_distances = {}
@@ -183,16 +194,20 @@ def display_season_palette(season):
 
 
 if __name__ == "__main__":
-    import argparse
 
-    parser = argparse.ArgumentParser(description="Detecting and cropping face")
+    parser = argparse.ArgumentParser(description="Color analyze clothing items")
     parser.add_argument("--input_dir", "-d", help="Input image file dir", dest="input_dir")
     parser.add_argument("--styles_dir", "-s", help="Style table dir", dest="styles_dir")
+    parser.add_argument("--db_name", "-db", help="Name of database", dest="db_name")
     args = parser.parse_args()
 
     dir = args.input_dir
     styles_dir = args.styles_dir
+    db_name = args.db_name
+    
+    # con = sqlite3.connect("small-fashion-dataset.db")
+    con = sqlite3.connect(db_name)
 
-    setup_fashion_table()
+    setup_fashion_table(con)
 
     run_color_analysis(dir, styles_dir)
