@@ -27,6 +27,8 @@ import numpy as np
 from typing import Tuple
 
 import argparse
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES=True
 
 def setup_fashion_table(con):
     cur = con.cursor()
@@ -52,6 +54,8 @@ def run_color_analysis(dir: str, styles_dir):
     style_table = pd.read_csv(styles_dir, index_col=0, on_bad_lines="warn")
     # get all files in dir
     files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
+    season_dist = {}
+    
 
     # create color palettes for each season first
     summer_palette = extract_colors(image="nonspecific-season-palettes/summer-palette.jpg", palette_size=144, sort_mode="luminance")
@@ -61,21 +65,24 @@ def run_color_analysis(dir: str, styles_dir):
 
     for file in tqdm(files):
         # Get season
-        season = color_analysis(file, spring_palette, summer_palette, winter_palette, autumn_palette)
-
-        # Get the file name without extension, and excluding the path
-        pid = int(Path(file).stem)
         try:
-            addn_info_col_vals = retr_addn_info(pid, style_table)
-        except KeyError:
-            # if pid not in table, ignore
-            continue
+            season = color_analysis(file, spring_palette, summer_palette, winter_palette, autumn_palette)
+        except:
+            print(f"Error analyzing image {file}")
+        else:
+            # Get the file name without extension, and excluding the path
+            pid = int(Path(file).stem)
+            try:
+                addn_info_col_vals = retr_addn_info(pid, style_table)
+            except KeyError:
+                # if pid not in table, ignore
+                continue
 
-        # full values
-        col_vals = addn_info_col_vals + (season,)
+            # full values
+            col_vals = addn_info_col_vals + (season,)
 
-        # insert into db
-        add_new_item_to_db(col_vals)
+            # insert into db
+            add_new_item_to_db(col_vals)
 
 
 def retr_addn_info(pid: str, style_table):
@@ -205,7 +212,6 @@ if __name__ == "__main__":
     styles_dir = args.styles_dir
     db_name = args.db_name
     
-    # con = sqlite3.connect("small-fashion-dataset.db")
     con = sqlite3.connect(db_name)
 
     setup_fashion_table(con)
