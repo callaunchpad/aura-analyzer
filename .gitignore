@@ -6,4 +6,5 @@
 color_analysis/fashion-dataset-small/*.*
 color_analysis/grailed-dataset/*
 *.csv
+*.zip
 node_modules

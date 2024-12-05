@@ -30,21 +30,21 @@ import argparse
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES=True
 
-def setup_fashion_table(con):
+def setup_items_table(con):
     cur = con.cursor()
     cur.execute(
-        """CREATE TABLE IF NOT EXISTS fashion(
-            id INTEGER PRIMARY KEY, 
-            gender TEXT, 
-            masterCategory TEXT, 
-            subCategory TEXT, 
-            articleType TEXT, 
-            baseColour TEXT, 
-            season TEXT, 
-            year INTEGER, 
-            usage TEXT, 
-            productDisplayName TEXT,
-            colorSeason TEXT
+        """CREATE TABLE IF NOT EXISTS items(
+            Id INTEGER PRIMARY KEY, 
+            Department TEXT, 
+            MasterCategory TEXT, 
+            SubCategory TEXT, 
+            Size TEXT, 
+            Color TEXT, 
+            Designers TEXT [], 
+            Hashtags TEXT [], 
+            ProductDisplayName TEXT, 
+            ItemUrl TEXT,
+            ColorSeason TEXT
         )"""
     )
 
@@ -52,10 +52,10 @@ def setup_fashion_table(con):
 def run_color_analysis(dir: str, styles_dir):
     # retrieve the styles_dir
     style_table = pd.read_csv(styles_dir, index_col=0, on_bad_lines="warn")
+    print(style_table.head())
     # get all files in dir
     files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
     season_dist = {}
-    
 
     # create color palettes for each season first
     summer_palette = extract_colors(image="nonspecific-season-palettes/summer-palette.jpg", palette_size=144, sort_mode="luminance")
@@ -64,6 +64,7 @@ def run_color_analysis(dir: str, styles_dir):
     autumn_palette = extract_colors(image="nonspecific-season-palettes/autumn-palette.jpg", palette_size=144, sort_mode="luminance")
 
     for file in tqdm(files):
+    # for file in files:
         # Get season
         try:
             season = color_analysis(file, spring_palette, summer_palette, winter_palette, autumn_palette)
@@ -80,47 +81,46 @@ def run_color_analysis(dir: str, styles_dir):
 
             # full values
             col_vals = addn_info_col_vals + (season,)
-
             # insert into db
             add_new_item_to_db(col_vals)
 
 
-def retr_addn_info(pid: str, style_table):
+def retr_addn_info(pid: int, style_table):
     row = style_table.loc[pid]
-
     col_vals = (
         pid,
-        row["gender"],
-        row["masterCategory"],
-        row["subCategory"],
-        row["articleType"],
-        row["baseColour"],
-        row["season"],
-        row["year"],
-        row["usage"],
-        row["productDisplayName"],
+        row["Department"],
+        row["MasterCategory"],
+        row["SubCategory"],
+        row["Size"],
+        row["Color"],
+        row["Designers"],
+        row["Hashtags"],
+        row["ProductDisplayName"],
+        row["ItemUrl"]
     )
+
     return col_vals
 
  
 def add_new_item_to_db(col_vals):
     cur = con.cursor()
-    # change to upsert
+    # upsert item
     cur.execute(
         """
-        INSERT INTO fashion(id, gender, masterCategory, subCategory, articleType, baseColour, season, year, usage, productDisplayName, colorSeason)
+        INSERT INTO items(Id, Department, MasterCategory, SubCategory, Size, Color, Designers, Hashtags, ProductDisplayName, ItemUrl, ColorSeason)
         VALUES(?,?,?,?,?,?,?,?,?,?,?) 
-        ON CONFLICT(id) DO UPDATE SET
-            gender=excluded.gender,
-            masterCategory=excluded.masterCategory,
-            subCategory=excluded.subCategory,
-            articleType=excluded.articleType,
-            baseColour=excluded.baseColour,
-            season=excluded.season,
-            year=excluded.year,
-            usage=excluded.usage,
-            productDisplayName=excluded.productDisplayName,
-            colorSeason=excluded.colorSeason
+        ON CONFLICT(Id) DO UPDATE SET
+            Department=excluded.Department,
+            masterCategory=excluded.MasterCategory,
+            SubCategory=excluded.SubCategory,
+            Size=excluded.Size,
+            Color=excluded.Color,
+            Designers=excluded.Designers,
+            Hashtags=excluded.Hashtags,
+            ProductDisplayName=excluded.ProductDisplayName,
+            ItemUrl=excluded.ItemUrl,
+            ColorSeason=excluded.ColorSeason
         """,
         col_vals,
     )
@@ -214,6 +214,6 @@ if __name__ == "__main__":
     
     con = sqlite3.connect(db_name)
 
-    setup_fashion_table(con)
+    setup_items_table(con)
 
     run_color_analysis(dir, styles_dir)

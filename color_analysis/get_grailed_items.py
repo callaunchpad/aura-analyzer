@@ -40,27 +40,6 @@ def get_products(client, product_specifications):
 
     return products
 
-def fix_category(row):
-    # gender
-    if row["gender"]=="menswear":
-        row["gender"] = "Men"
-    else:
-        row["gender"] = "Women"
-    # category
-    if row["masterCategory"]=="tops" or row["masterCategory"]=="outerwear" or row["masterCategory"]=="womens_tops" or row["masterCategory"]=="womens_outerwear":
-        row["subCategory"] = "Topwear"
-        row["masterCategory"] = "Apparel"
-    elif row["masterCategory"]=="bottoms" or row["masterCategory"]=="womens_bottoms":
-        row["subCategory"] = "Bottomwear"
-        row["masterCategory"] = "Apparel"
-    elif row["masterCategory"]=="accessrories" or row["masterCategory"]=="womens_accessories":
-        row["masterCategory"]="Accessories"
-    elif row["masterCategory"]=="footwear" or row["masterCategory"]=="womens_footwear":
-        row["subCategory"]="Footwear"
-        row["masterCategory"]="Accessories"
-
-    return row
-
 def download_and_save_products(products):
     data = []
     num_downloaded=0
@@ -69,18 +48,19 @@ def download_and_save_products(products):
         product_id = product["cover_photo"]["listing_id"]
         image_url = product["cover_photo"]["image_url"]
         save_path = f"{data_path}/images/{product_id}.jpg"
+        # print(product["category"].split('.'))
         data.append(
             {
-                "id": product_id,
-                "gender": product["department"],
-                "masterCategory": product["category"],
-                "subCategory": product["category_path"],
-                "articleType": product["category_path_size"],
-                "baseColour": product["color"],
-                "season": None,
-                "year": None,
-                "usage": "Casual", 
-                "productDisplayName": product["description"]
+                "Id": product_id,
+                "Department": product["department"],
+                "MasterCategory": product["category_path_size"].split('.')[0],
+                "SubCategory": product["category_path_size"].split('.')[1],
+                "Size": product["category_path_size"].split('.')[2],
+                "Color": product["color"],
+                "Designers": product["designers"],
+                "Hashtags": product["hashtags"],
+                "ProductDisplayName": product["description"],
+                "ItemUrl": product["cover_photo"]["url"]
             }
         )
         # check if photo already downloaded
@@ -92,8 +72,7 @@ def download_and_save_products(products):
 
     print(f"Downloaded {num_downloaded} images; already downloaded {already_downloaded} images in results")
     # create empty dataframe
-    df = pd.DataFrame(data=data, columns=['id', 'gender', 'masterCategory', 'subCategory', 'articleType', 'baseColour', 'season', 'year', 'usage', 'productDisplayName'])
-    df = df.apply(fix_category, axis=1)
+    df = pd.DataFrame(data=data, columns=["Id", "Department", "MasterCategory", "SubCategory", "Size", "Color", "Designers", "Hashtags", "ProductDisplayName", "ItemUrl"])
     print(df.head())
 
     df.to_csv(f'{data_path}/styles_grailed.csv', index=False)
