@@ -1,5 +1,6 @@
 from typing import Annotated, Literal
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File, UploadFile, HTTPException, Depends, Form
 from pydantic import BaseModel
 from PIL import Image
@@ -10,7 +11,7 @@ from sqlalchemy import func
 import subprocess
 
 class AuraRequest(BaseModel):
-    outfit_style: Literal['Casual', 'Ethnic', 'Formal', 'Home', 'Party', 'Smart Casual', 'Sports', 'Travel'] | None
+    outfit_style: Literal['Casual', 'Ethnic', 'Formal', 'Home', 'Party', 'Smart Casual', 'Sports', 'Travel']
     gender_expression: Literal['Boys', 'Girls', 'Men', 'Unisex', 'Women']
     colorSeason: Literal['autumn', 'winter', 'spring', 'summer']
     num_outfits: int = 1
@@ -51,6 +52,14 @@ def get_session():
 SessionDep = Annotated[Session, Depends(get_session)]
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
 
 @app.get("/")
 def read_root():
