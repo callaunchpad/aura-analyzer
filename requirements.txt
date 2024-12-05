@@ -15,3 +15,4 @@ imutils
 fastapi
 uvicorn
 sqlmodel
+gunicorn
