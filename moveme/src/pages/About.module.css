@@ -1,0 +1,78 @@
+.aboutContainer {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  padding-top: 60px;
+}
+
+.title {
+  color: #cf7baf;
+  padding: 2rem;
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-family: 'Modak', cursive;
+  letter-spacing: 1px;
+  text-transform: lowercase;
+  line-height: 1.2;
+  -webkit-text-stroke: 2px white;
+  text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+}
+
+.roundImage {
+  width: 100px;  
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0;
+  display: block;
+  border: 3px solid #cf7baf;  
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);  
+}
+
+.content {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: white;
+  font-family: "Futura", cursive;
+  margin-bottom: 50px;  
+}
+
+.content p {
+  margin-bottom: 1rem;
+}
+
+.facesGrid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.facesRow {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+.faceName {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-family: "Futura", cursive;
+  text-transform: lowercase;
+}
+
+.roundImage {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #cf7baf;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+  margin: 0;
+  display: block;
+}
