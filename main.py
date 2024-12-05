@@ -59,7 +59,7 @@ def on_startup():
     create_db_and_tables()
 
 def run_demo(filename: str):
-    script_path = os.path.join(os.path.dirname(__file__), 'combined_demo', 'scripts', 'run_demo.sh')
+    script_path = os.path.join(os.path.dirname(__file__),'run_demo.sh')
     result = subprocess.run([script_path, filename], capture_output=True)
     output = result.stdout
     str_output = str(output)
