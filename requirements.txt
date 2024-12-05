@@ -1,4 +1,4 @@
-torch
+torch==2.4.0
 torchvision==0.19.1
 tensorboard
 numpy
@@ -13,4 +13,5 @@ Pylette
 mediapipe
 imutils
 fastapi
+uvicorn
 sqlmodel
