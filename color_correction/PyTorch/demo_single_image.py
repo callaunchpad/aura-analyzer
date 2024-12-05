@@ -25,7 +25,7 @@ def get_args():
     parser.add_argument(
         "--model_dir",
         "-m",
-        default="../../color_correction/PyTorch/models",
+        default="color_correction/PyTorch/models",
         help="Specify the directory of the trained model.",
         dest="model_dir",
     )

@@ -77,7 +77,7 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
 # STEP 2: Create an FaceDetector object.
-base_options = python.BaseOptions(model_asset_path="../../face_detect/facedec/detector.tflite")
+base_options = python.BaseOptions(model_asset_path="face_detect/facedec/detector.tflite")
 options = vision.FaceDetectorOptions(base_options=base_options)
 detector = vision.FaceDetector.create_from_options(options)
 
@@ -102,8 +102,8 @@ rgb_annotated_image = imutils.resize(rgb_annotated_image, width=800)
 
 # SAVE CROPPED AS IMAGE: cv2.imwrite("cropped.jpg", cropped)
 
-cv2.imwrite("../output-imgs/redbox.jpg", rgb_annotated_image)
-cv2.imwrite("../output-imgs/cropped.jpg", cropped)
+cv2.imwrite("combined_demo/output-imgs/redbox.jpg", rgb_annotated_image)
+cv2.imwrite("combined_demo/output-imgs/cropped.jpg", cropped)
 
 # cv2.imshow("Gotchaface", rgb_annotated_image)
 # cv2.waitKey(0)

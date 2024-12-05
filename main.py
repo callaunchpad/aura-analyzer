@@ -65,8 +65,8 @@ def run_demo(filename: str):
     str_output = str(output)
     index = str_output.index("your color season is")
     color_season = str_output[index+len("your color season is "):-3]
-    print("Success")
-    print(color_season)
+    # print("Success")
+    # print(color_season)
     return color_season
 
 # Get color season
@@ -81,10 +81,10 @@ async def aura_analyze(
     if not os.path.exists("combined_demo/output-imgs"):
         os.makedirs("combined_demo/output-imgs")
 
-    name = "combined_demo/input-imgs/input.jpg"
+    name = "input.jpg"
     contents = file.file.read()
     im = Image.open(BytesIO(contents)).convert("RGB")
-    im.save(name)
+    im.save(f"combined_demo/input-imgs/{name}")
     color_season = run_demo(name)
 
     return color_season

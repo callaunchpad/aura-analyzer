@@ -114,26 +114,26 @@ def parse_color_analysis_results(result):
     
 def display_season_palette(season):
     if (season == "summer"):
-        palette = extract_colors(image='../../color_analysis/season-palettes/cool-summer.JPG', palette_size=48)
+        palette = extract_colors(image='color_analysis/season-palettes/cool-summer.JPG', palette_size=48)
     elif (season == "winter"):
-        palette = extract_colors(image='../../color_analysis/season-palettes/cool-winter.JPG', palette_size=48)
+        palette = extract_colors(image='color_analysis/season-palettes/cool-winter.JPG', palette_size=48)
     elif (season == "autumn"):
-        palette = extract_colors(image='../../color_analysis/season-palettes/warm-autumn.JPG', palette_size=48)
+        palette = extract_colors(image='color_analysis/season-palettes/warm-autumn.JPG', palette_size=48)
     else:
-        palette = extract_colors(image='../../color_analysis/season-palettes/warm-spring.JPG', palette_size=48)
+        palette = extract_colors(image='color_analysis/season-palettes/warm-spring.JPG', palette_size=48)
     
-    palette.display(save_to_file=True, filename="../output-imgs/your-palette")
+    palette.display(save_to_file=True, filename="combined-demo/output-imgs/your-palette")
     return
 
 def save_season_palette(season):
     if (season == "summer"):
-        palette = extract_colors(image='../../color_analysis/season-palettes/cool-summer.JPG', palette_size=48)
+        palette = extract_colors(image='color_analysis/season-palettes/cool-summer.JPG', palette_size=48)
     elif (season == "winter"):
-        palette = extract_colors(image='../../color_analysis/season-palettes/cool-winter.JPG', palette_size=48)
+        palette = extract_colors(image='color_analysis/season-palettes/cool-winter.JPG', palette_size=48)
     elif (season == "autumn"):
-        palette = extract_colors(image='../../color_analysis/season-palettes/warm-autumn.JPG', palette_size=48)
+        palette = extract_colors(image='color_analysis/season-palettes/warm-autumn.JPG', palette_size=48)
     else:
-        palette = extract_colors(image='../../color_analysis/season-palettes/warm-spring.JPG', palette_size=48)
+        palette = extract_colors(image='color_analysis/season-palettes/warm-spring.JPG', palette_size=48)
 
     w, h = 48, 48
     img = Image.new("RGB", size=(w * palette.number_of_colors, h))
@@ -143,7 +143,7 @@ def save_season_palette(season):
         arr[:, i * h : (i + 1) * h, :] = c.rgb
     img = Image.fromarray(arr, "RGB")
 
-    img.save(f"../output-imgs/your-palette.jpg")
+    img.save(f"combined_demo/output-imgs/your-palette.jpg")
     
 # python script code
 # import argparser
