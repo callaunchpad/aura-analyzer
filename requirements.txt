@@ -13,3 +13,4 @@ Pylette
 mediapipe
 imutils
 fastapi
+sqlmodel
