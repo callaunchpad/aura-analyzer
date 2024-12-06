@@ -56,6 +56,11 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 app = FastAPI()
 
+# Ensure the app listens on the correct port
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all origins

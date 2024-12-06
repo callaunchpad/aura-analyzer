@@ -12,7 +12,8 @@ opencv-python
 Pylette
 mediapipe
 imutils
-fastapi
+fastapi[all]
 uvicorn
 sqlmodel
 gunicorn
+SQLAlchemy
