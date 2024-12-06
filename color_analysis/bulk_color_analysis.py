@@ -54,8 +54,11 @@ def run_color_analysis(dir: str, styles_dir):
     style_table = pd.read_csv(styles_dir, index_col=0, on_bad_lines="warn")
     print(style_table.head())
     # get all files in dir
-    files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
-    season_dist = {}
+    files = list(map(lambda x: f'{dir}/{x}.jpg', style_table.index.values.tolist()))
+    # print(files)
+    # return
+    # files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
+    # season_dist = {}
 
     # create color palettes for each season first
     summer_palette = extract_colors(image="nonspecific-season-palettes/summer-palette.jpg", palette_size=144, sort_mode="luminance")
@@ -64,7 +67,6 @@ def run_color_analysis(dir: str, styles_dir):
     autumn_palette = extract_colors(image="nonspecific-season-palettes/autumn-palette.jpg", palette_size=144, sort_mode="luminance")
 
     for file in tqdm(files):
-    # for file in files:
         # Get season
         try:
             season = color_analysis(file, spring_palette, summer_palette, winter_palette, autumn_palette)
