@@ -1,0 +1,112 @@
+#root {
+  background-color: black;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  background-color: black;
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+.box {
+  padding: 10px;
+}
+
+.textsss {
+  margin-top: 5px;
+  /* color: white; */
+
+  color: #cf7baf;
+  font-size: 7rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-family: 'Modak', cursive;
+  letter-spacing: 1px;
+  text-transform: lowercase;
+  line-height: 1.2;
+  -webkit-text-stroke: 2px white;
+  text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+}
+
+.up {
+  color: white;
+  font-size: 20px;
+  font-family: 'Futura', cursive;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Hide the default file input */
+#fileInput {
+  display: none;
+}
+
+/* Custom file input button */
+.file-input-label {
+  background-color: #cf7baf;
+  color: white;
+  padding: 200px 200px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Futura', cursive;
+  font-size: 3rem;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.file-input-label:hover {
+  background-color: #cf7bafd4;
+}
+
+.auralyze {
+  color: white;
+  font-size: 3rem;
+  font-family: 'Futura', cursive;
+  background-color: #cf7baf;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.auralyze:hover {
+  background-color: #cf7bafd4;
+}

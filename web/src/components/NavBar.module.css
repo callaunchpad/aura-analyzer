@@ -1,0 +1,61 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #facde5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-family: 'Modak', cursive;
+  letter-spacing: 1px;
+  line-height: 1;
+  margin-top: 5px;
+}
+
+.logoLink {
+  color: white;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+}
+
+.logoLink:hover {
+  color: #000000;
+  transition: color 0.3s ease;
+}
+
+.logoImage {
+  width: 120px; /* Adjust the width to make it twice as big */
+  height: auto; /* Maintain aspect ratio */
+}
+
+.navLinks {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 1.4rem;
+  letter-spacing: 0.5px;
+}
+
+.navLink {
+  color: #cf7baf;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  transition: color 0.3s ease;
+  font-family: 'Modak', cursive;
+}
+
+.navLink:hover {
+  color: #965a81
+}
