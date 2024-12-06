@@ -73,6 +73,10 @@ app.add_middleware(
 def read_root():
     return {"Hello": "World"}
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
