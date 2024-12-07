@@ -1,6 +1,13 @@
 import argparse
 import math
+import os
+from subprocess import STDOUT, check_call
 from typing import Tuple, Union
+
+check_call(["apt-get", "update"], stdout=open(os.devnull, "wb"), stderr=STDOUT)
+check_call(["apt-get", "install", "-y", "libgl1"], stdout=open(os.devnull, "wb"), stderr=STDOUT)
+check_call(["apt-get", "install", "-y", "libglib2.0-0"], stdout=open(os.devnull, "wb"), stderr=STDOUT)
+check_call(["apt-get", "update"], stdout=open(os.devnull, "wb"), stderr=STDOUT)
 
 import cv2
 import imutils
@@ -71,53 +78,53 @@ def visualize(image, detection_result) -> np.ndarray:
     return annotated_image, cropped
 
 
-import os
+if __name__ == "__main__":
 
-# STEP 1: Import the necessary modules.
-import mediapipe as mp
-from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
+    # STEP 1: Import the necessary modules.
+    import mediapipe as mp
+    from mediapipe.tasks import python
+    from mediapipe.tasks.python import vision
 
-# STEP 2: Create an FaceDetector object.
-base_options = python.BaseOptions(model_asset_path="face_detect/facedec/detector.tflite")
-options = vision.FaceDetectorOptions(base_options=base_options)
-detector = vision.FaceDetector.create_from_options(options)
+    # STEP 2: Create an FaceDetector object.
+    base_options = python.BaseOptions(model_asset_path="face_detect/facedec/detector.tflite")
+    options = vision.FaceDetectorOptions(base_options=base_options)
+    detector = vision.FaceDetector.create_from_options(options)
 
-parser = argparse.ArgumentParser(description="Changing WB of an input image.")
-parser.add_argument("--input", "-i", help="Input image filename", dest="input", default="../example_images/00.JPG")
-args = parser.parse_args()
+    parser = argparse.ArgumentParser(description="Changing WB of an input image.")
+    parser.add_argument("--input", "-i", help="Input image filename", dest="input", default="../example_images/00.JPG")
+    parser.add_argument("--file_name", dest="file_name")
+    args = parser.parse_args()
 
-# STEP 3: Load the input image.
-IMAGE_FILE = args.input
-image = mp.Image.create_from_file(IMAGE_FILE)
+    # STEP 3: Load the input image.
+    IMAGE_FILE = args.input
+    image = mp.Image.create_from_file(IMAGE_FILE)
 
-# STEP 4: Detect faces in the input image.
-detection_result = detector.detect(image)
+    # STEP 4: Detect faces in the input image.
+    detection_result = detector.detect(image)
 
-# STEP 5: Process the detection result. In this case, visualize it.
-image_copy = np.copy(image.numpy_view())
-annotated_image, cropped = visualize(image_copy, detection_result)
-cropped = imutils.resize(cropped, width=800)
-cropped_pil = Image.fromarray(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
-img = cv2.imread(IMAGE_FILE)
-rgb_annotated_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
-rgb_annotated_image = imutils.resize(rgb_annotated_image, width=800)
-rgb_annotated_image_pil = Image.fromarray(cv2.cvtColor(rgb_annotated_image, cv2.COLOR_BGR2RGB))
+    # STEP 5: Process the detection result. In this case, visualize it.
+    image_copy = np.copy(image.numpy_view())
+    annotated_image, cropped = visualize(image_copy, detection_result)
+    cropped = imutils.resize(cropped, width=800)
+    cropped_pil = Image.fromarray(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
+    img = cv2.imread(IMAGE_FILE)
+    rgb_annotated_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
+    rgb_annotated_image = imutils.resize(rgb_annotated_image, width=800)
+    rgb_annotated_image_pil = Image.fromarray(cv2.cvtColor(rgb_annotated_image, cv2.COLOR_BGR2RGB))
 
-# SAVE CROPPED AS IMAGE: cv2.imwrite("cropped.jpg", cropped)
-# switch to os for saving images
-out_dir = "combined_demo/output-imgs"
-if not os.path.exists(out_dir):
-    os.mkdir(out_dir)
-rgb_annotated_image_pil.save(os.path.join(out_dir, "redbox.jpg"))
-cropped_pil.save(os.path.join(out_dir, "cropped.jpg"))
+    out_dir = "combined_demo/output-imgs/"
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
 
-# cv2.imwrite("combined_demo/output-imgs/redbox.jpg", rgb_annotated_image)
-# cv2.imwrite("combined_demo/output-imgs/cropped.jpg", cropped)
+    rgb_annotated_image_pil.save(os.path.join(out_dir, f"{args.file_name}-redbox.jpg"))
+    cropped_pil.save(os.path.join(out_dir, f"{args.file_name}-cropped.jpg"))
 
-# cv2.imshow("Gotchaface", rgb_annotated_image)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
-# cv2.imshow("CROPPED", cropped)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+    # cv2.imwrite("combined_demo/output-imgs/redbox.jpg", rgb_annotated_image)
+    # cv2.imwrite("combined_demo/output-imgs/cropped.jpg", cropped)
+
+    # cv2.imshow("Gotchaface", rgb_annotated_image)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+    # cv2.imshow("CROPPED", cropped)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()

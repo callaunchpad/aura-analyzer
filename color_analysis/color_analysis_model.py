@@ -1,17 +1,19 @@
-import os
-import numpy as np
 import argparse
+import os
+
+import numpy as np
 import torch
-from torchvision import transforms
-from PIL import Image
-from sklearn.model_selection import train_test_split
 import torch.nn as nn
-from torchvision.models import resnet18, ResNet18_Weights
+from PIL import Image
 from Pylette import extract_colors
+from sklearn.model_selection import train_test_split
+from torchvision import transforms
+from torchvision.models import ResNet18_Weights, resnet18
 
 
 class ColorDataset(torch.utils.data.Dataset):
     """Defines the dataset with image paths and their corresponding labels."""
+
     def __init__(self, image_paths, labels, transform=None):
         self.image_paths = image_paths
         self.labels = labels
@@ -31,6 +33,7 @@ class ColorDataset(torch.utils.data.Dataset):
 
 class ResNetColorAnalysis(nn.Module):
     """Defines the ResNet-based model for color abalysis classification"""
+
     def __init__(self, num_classes=4):
         super(ResNetColorAnalysis, self).__init__()
         self.base_model = resnet18(weights=ResNet18_Weights.DEFAULT)
@@ -57,17 +60,21 @@ def load_and_split_data(data_dir, test_size=0.2, random_state=42):
                 labels.append(class_to_idx[class_name])
 
     # Split the data into training and testing sets
-    train_set, test_set, train_labels, test_labels = train_test_split(image_paths, labels, test_size=test_size, random_state=random_state, stratify=labels)
+    train_set, test_set, train_labels, test_labels = train_test_split(
+        image_paths, labels, test_size=test_size, random_state=random_state, stratify=labels
+    )
     return train_set, test_set, train_labels, test_labels, class_labels
 
 
-def train_model(model, train_loader, criterion, optimizer, num_epochs=10, device='cpu', save_path='color_analysis/trained_model.pth'):
+def train_model(
+    model, train_loader, criterion, optimizer, num_epochs=10, device="cpu", save_path="color_analysis/trained_model.pth"
+):
     """Train the model and save it locally after training."""
     # Ensure the directory for the model save path exists
     save_dir = os.path.dirname(save_path)
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    
+
     # Model is set to training mode
     model.train()
     for epoch in range(num_epochs):
@@ -102,7 +109,7 @@ def train_model(model, train_loader, criterion, optimizer, num_epochs=10, device
 #     running_loss = 0.0
 #     correct = 0
 #     total = 0
-#     criterion = nn.CrossEntropyLoss()  
+#     criterion = nn.CrossEntropyLoss()
 #     with torch.no_grad():
 #         for inputs, labels in test_loader:
 #             inputs, labels = inputs.to(device), labels.to(device)
@@ -118,7 +125,7 @@ def train_model(model, train_loader, criterion, optimizer, num_epochs=10, device
 #     return test_loss, test_accuracy
 
 
-def predict_image(model, image_path, class_labels, transform, device='cpu'):
+def predict_image(model, image_path, class_labels, transform, device="cpu"):
     """Predicts the class of a single image"""
     model.eval()
     image = Image.open(image_path).convert("RGB")
@@ -129,7 +136,7 @@ def predict_image(model, image_path, class_labels, transform, device='cpu'):
         return class_labels[pred.item()]
 
 
-def load_pretrained_model(model, save_path='color_analysis/trained_model.pth', device='cpu'):
+def load_pretrained_model(model, save_path="color_analysis/trained_model.pth", device="cpu"):
     """Loads a previously trained model or creates the model from scratch if no model is found"""
     if os.path.exists(save_path):
         model.load_state_dict(torch.load(save_path, map_location=device, weights_only=True))
@@ -137,8 +144,10 @@ def load_pretrained_model(model, save_path='color_analysis/trained_model.pth', d
     return model
 
 
-def save_season_palette(predicted_season):
-    palette = extract_colors(image=f'color_analysis/nonspecific-season-palettes/{predicted_season}-palette.jpg', palette_size=48)
+def save_season_palette(predicted_season, file_name):
+    palette = extract_colors(
+        image=f"color_analysis/nonspecific-season-palettes/{predicted_season}-palette.jpg", palette_size=48
+    )
     w, h = 48, 48
     img = Image.new("RGB", size=(w * palette.number_of_colors, h))
     arr = np.asarray(img).copy()
@@ -146,13 +155,14 @@ def save_season_palette(predicted_season):
         c = palette.colors[i]
         arr[:, i * h : (i + 1) * h, :] = c.rgb
     img = Image.fromarray(arr, "RGB")
-    img.save(f"combined_demo/output-imgs/your-palette.jpg")
+    img.save(f"combined_demo/output-imgs/{file_name}.jpg")
 
 
 def main():
     # Get the image path for the prediction
     parser = argparse.ArgumentParser(description="ResNet-18 Color Analysis")
     parser.add_argument("--image_path", "-i", help="Path to image for prediction", required=True)
+    parser.add_argument("--file_name", dest="file_name")
     args = parser.parse_args()
 
     # Parameters
@@ -162,14 +172,16 @@ def main():
     num_epochs = 3
     learning_rate = 0.0001
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    save_path = 'color_analysis/trained_model.pth'  
+    save_path = "color_analysis/trained_model.pth"
 
     # Transform the input image for consistency
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
+    transform = transforms.Compose(
+        [
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]
+    )
 
     # Create training sets, testing sets, and DataLoaders
     train_set, test_set, train_labels, test_labels, class_labels = load_and_split_data(data_dir)
@@ -186,7 +198,9 @@ def main():
 
     model = load_pretrained_model(model, save_path, device)
     if not os.path.exists(save_path):
-        train_model(model, train_loader, criterion, optimizer, num_epochs=num_epochs, device=device, save_path=save_path)
+        train_model(
+            model, train_loader, criterion, optimizer, num_epochs=num_epochs, device=device, save_path=save_path
+        )
 
     # test_loss, test_accuracy = test_model(model, test_loader, device=device)
     # print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.2f}%")
@@ -195,10 +209,10 @@ def main():
     predicted_season = predict_image(model, args.image_path, class_labels, transform, device=device)
     if predicted_season:
         print(f"your color season is {predicted_season}")
-        save_season_palette(predicted_season)    
+        save_season_palette(predicted_season, args.file_name)
     else:
         print(f"your color season is null")
-    
+
 
 if __name__ == "__main__":
     main()
