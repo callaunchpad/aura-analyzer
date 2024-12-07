@@ -142,6 +142,7 @@ def load_pretrained_model(model, save_path='color_analysis/trained_model.pth', d
 
 def main():
     # Get the image path for the prediction
+    print("hello sh")
     parser = argparse.ArgumentParser(description="ResNet-18 Color Analysis")
     parser.add_argument("--image_path", "-i", help="Path to image for prediction", required=True)
     args = parser.parse_args()

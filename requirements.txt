@@ -18,7 +18,3 @@ sqlmodel
 gunicorn
 SQLAlchemy
 pydantic
-sklearn 
-argparse
-PIL
-os
