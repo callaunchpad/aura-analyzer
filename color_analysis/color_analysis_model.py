@@ -148,7 +148,6 @@ def save_season_palette(predicted_season):
         c = palette.colors[i]
         arr[:, i * h : (i + 1) * h, :] = c.rgb
     img = Image.fromarray(arr, "RGB")
-
     img.save(f"combined_demo/output-imgs/your-palette.jpg")
 
 
@@ -177,10 +176,10 @@ def main():
     # Create training sets, testing sets, and DataLoaders
     train_set, test_set, train_labels, test_labels, class_labels = load_and_split_data(data_dir)
     train_dataset = ColorDataset(train_set, train_labels, transform=transform)
-    test_dataset = ColorDataset(test_set, test_labels, transform=transform)
+    # test_dataset = ColorDataset(test_set, test_labels, transform=transform)
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    # test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     # Initalize, load, and evaluate the model's performance on the test set
     model = ResNetColorAnalysis(num_classes=num_classes).to(device)
