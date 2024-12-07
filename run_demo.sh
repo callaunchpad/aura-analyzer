@@ -9,13 +9,11 @@ fi
 # Assign the argument to a variable
 IMAGE_FILE=$1
 
-
 #Check if  file exists
 if [ ! -f "combined_demo/input-imgs/$IMAGE_FILE" ]; then
     echo "Error: File '$IMAGE_FILE' does not exist."
     exit 1
 fi
-
 
 #Checks if file is an image
 if ! file "combined_demo/input-imgs/$IMAGE_FILE" | grep -iE 'image|bitmap'; then
