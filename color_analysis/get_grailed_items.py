@@ -26,17 +26,23 @@ def download_image(save_path, image_url):
                 handle.write(block)
 
 def get_products(client, product_specifications):
-
+    department = product_specifications["department"]
+    product_specifications.pop("department")
+    if department=="menswear":
+        department = Departments.MENSWEAR
+    else:
+        department = Departments.WOMENSWEAR
     products = client.find_products(
+        sold=True,
+        on_sale=True,
         conditions=[Conditions.IS_GENTLY_USED, Conditions.IS_NEW],
         markets=[Markets.BASIC, Markets.GRAILED],
         locations=[Locations.US, Locations.ASIA, Locations.EUROPE],
-        # department=Departments.MENSWEAR,
-        department=Departments.WOMENSWEAR,
+        department=department,
         **product_specifications
     )
 
-    print(f"Fetched {len(products)} products...")
+    # print(f"Fetched {len(products)} products...")
 
     return products
 
@@ -49,22 +55,23 @@ def download_and_save_products(products):
         image_url = product["cover_photo"]["image_url"]
         save_path = f"{data_path}/images/{product_id}.jpg"
         # print(product["category"].split('.'))
-        data.append(
-            {
-                "Id": product_id,
-                "Department": product["department"],
-                "MasterCategory": product["category_path_size"].split('.')[0],
-                "SubCategory": product["category_path_size"].split('.')[1],
-                "Size": product["category_path_size"].split('.')[2],
-                "Color": product["color"],
-                "Designers": product["designers"],
-                "Hashtags": product["hashtags"],
-                "ProductDisplayName": product["description"],
-                "ItemUrl": product["cover_photo"]["url"]
-            }
-        )
         # check if photo already downloaded
         if not os.path.exists(save_path):
+            
+            data.append(
+                {
+                    "Id": product_id,
+                    "Department": product["department"],
+                    "MasterCategory": product["category_path_size"].split('.')[0],
+                    "SubCategory": product["category_path_size"].split('.')[1],
+                    "Size": product["category_path_size"].split('.')[2],
+                    "Color": product["color"],
+                    "Designers": product["designers"],
+                    "Hashtags": product["hashtags"],
+                    "ProductDisplayName": product["description"],
+                    "ItemUrl": product["cover_photo"]["url"]
+                }
+            )
             download_image(save_path, image_url)
             num_downloaded+=1
         else:
@@ -73,15 +80,22 @@ def download_and_save_products(products):
     print(f"Downloaded {num_downloaded} images; already downloaded {already_downloaded} images in results")
     # create empty dataframe
     df = pd.DataFrame(data=data, columns=["Id", "Department", "MasterCategory", "SubCategory", "Size", "Color", "Designers", "Hashtags", "ProductDisplayName", "ItemUrl"])
-    print(df.head())
+    # print(df.head())
+    # print(len(df))
 
+    if os.path.exists(f'{data_path}/styles_grailed.csv'):
+        df_old = pd.read_csv(f'{data_path}/styles_grailed.csv')
+        df = pd.concat([df_old, df])
+
+    # print(len(df))
     df.to_csv(f'{data_path}/styles_grailed.csv', index=False)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fetching and downloading items from Grailed")
-    # parser.add_argument("--gender", "-g", help="Gender, mens or womens", dest="department")
+    parser.add_argument("--gender", "-g", help="Gender, mens or womens", dest="department")
     parser.add_argument("--query_search", "-q", help="Query to look up", dest="query_search")
     parser.add_argument("--num_hits", "-n", help="Number of hits to pull up", dest="hits_per_page", default=1)
+    parser.add_argument("--page", "-p", help="Page number", dest="page", default=1)
     # parser.add_argument("--categories", "-c", helper="Iterable of categories to include")
     parser.add_argument("--price_from", "-l", help="Min price", dest="price_from", default=0)
     parser.add_argument("--price_to", "-m", help="Max price", dest="price_to", default=100)
