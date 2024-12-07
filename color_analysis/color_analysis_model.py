@@ -135,7 +135,6 @@ def load_pretrained_model(model, save_path='color_analysis/trained_model.pth', d
     if os.path.exists(save_path):
         model.load_state_dict(torch.load(save_path, map_location=device, weights_only=True))
         model.eval()
-        print(f"Loaded pretrained model from {save_path}")
     else:
         print("No pretrained model found. Training from scratch.")
     return model
@@ -163,7 +162,6 @@ def main():
     ])
 
     # Create training and testing sets
-    print("Loading and splitting data...")
     train_set, test_set, train_labels, test_labels, class_labels = load_and_split_data(data_dir)
     train_dataset = ColorDataset(train_set, train_labels, transform=transform)
     test_dataset = ColorDataset(test_set, test_labels, transform=transform)
@@ -182,12 +180,10 @@ def main():
         print("Training the model...")
         train_model(model, train_loader, criterion, optimizer, num_epochs=num_epochs, device=device, save_path=save_path)
 
-    print("Testing the model...")
     test_loss, test_accuracy = test_model(model, test_loader, device=device)
     print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.2f}%")
 
     # Predict the season of the input image with the trained model
-    print(f"Predicting season for image: {args.image_path}")
     predicted_season = predict_image(model, args.image_path, class_labels, transform, device=device)
     if predicted_season:
         print(f"Predicted Season: {predicted_season}")

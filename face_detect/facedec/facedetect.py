@@ -3,9 +3,9 @@ import math
 from typing import Tuple, Union
 
 import cv2
+import imutils
 import numpy as np
 from PIL import Image
-import imutils
 
 MARGIN = 10  # pixels
 ROW_SIZE = 10  # pixels
@@ -71,6 +71,8 @@ def visualize(image, detection_result) -> np.ndarray:
     return annotated_image, cropped
 
 
+import os
+
 # STEP 1: Import the necessary modules.
 import mediapipe as mp
 from mediapipe.tasks import python
@@ -96,14 +98,22 @@ detection_result = detector.detect(image)
 image_copy = np.copy(image.numpy_view())
 annotated_image, cropped = visualize(image_copy, detection_result)
 cropped = imutils.resize(cropped, width=800)
+cropped_pil = Image.fromarray(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
 img = cv2.imread(IMAGE_FILE)
 rgb_annotated_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
 rgb_annotated_image = imutils.resize(rgb_annotated_image, width=800)
+rgb_annotated_image_pil = Image.fromarray(cv2.cvtColor(rgb_annotated_image, cv2.COLOR_BGR2RGB))
 
 # SAVE CROPPED AS IMAGE: cv2.imwrite("cropped.jpg", cropped)
+# switch to os for saving images
+out_dir = "combined_demo/output-imgs"
+if not os.path.exists(out_dir):
+    os.mkdir(out_dir)
+rgb_annotated_image_pil.save(os.path.join(out_dir, "redbox.jpg"))
+cropped_pil.save(os.path.join(out_dir, "cropped.jpg"))
 
-cv2.imwrite("combined_demo/output-imgs/redbox.jpg", rgb_annotated_image)
-cv2.imwrite("combined_demo/output-imgs/cropped.jpg", cropped)
+# cv2.imwrite("combined_demo/output-imgs/redbox.jpg", rgb_annotated_image)
+# cv2.imwrite("combined_demo/output-imgs/cropped.jpg", cropped)
 
 # cv2.imshow("Gotchaface", rgb_annotated_image)
 # cv2.waitKey(0)
