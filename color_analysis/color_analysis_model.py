@@ -184,7 +184,6 @@ def main():
     print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.2f}%")
 
     # Predict the season of the input image with the trained model
-    print(f"Predicting season for image: {args.image_path}")
     predicted_season = predict_image(model, args.image_path, class_labels, transform, device=device)
     if predicted_season:
         print(f"Predicted Season: {predicted_season}")
