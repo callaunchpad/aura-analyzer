@@ -96,27 +96,27 @@ def train_model(model, train_loader, criterion, optimizer, num_epochs=10, device
     torch.save(model.state_dict(), save_path)
 
 
-# def test_model(model, test_loader, device='cpu'):
-#     """Evaluate the model on the test set and return accuracy"""
-#     # Model is set to evaluation mode
-#     model.eval()
-#     running_loss = 0.0
-#     correct = 0
-#     total = 0
-#     criterion = nn.CrossEntropyLoss()  
-#     with torch.no_grad():
-#         for inputs, labels in test_loader:
-#             inputs, labels = inputs.to(device), labels.to(device)
-#             outputs = model(inputs)
-#             loss = criterion(outputs, labels)
-#             running_loss += loss.item()
-#             _, preds = torch.max(outputs, 1)
-#             correct += (preds == labels).sum().item()
-#             total += labels.size(0)
+def test_model(model, test_loader, device='cpu'):
+    """Evaluate the model on the test set and return accuracy"""
+    # Model is set to evaluation mode
+    model.eval()
+    running_loss = 0.0
+    correct = 0
+    total = 0
+    criterion = nn.CrossEntropyLoss()  
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            inputs, labels = inputs.to(device), labels.to(device)
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            running_loss += loss.item()
+            _, preds = torch.max(outputs, 1)
+            correct += (preds == labels).sum().item()
+            total += labels.size(0)
 
-#     test_loss = running_loss / len(test_loader)
-#     test_accuracy = correct / total * 100
-#     return test_loss, test_accuracy
+    test_loss = running_loss / len(test_loader)
+    test_accuracy = correct / total * 100
+    return test_loss, test_accuracy
 
 
 def predict_image(model, image_path, class_labels, transform, device='cpu'):
