@@ -57,6 +57,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: python-app
+      
+      # Create the /home/site/wwwroot directory if it doesn't exist
+      - name: Create /home/site/wwwroot directory
+        run: mkdir -p /home/site/wwwroot
 
       - name: Unzip artifact for deployment
         run: unzip release.zip -d /home/site/wwwroot
