@@ -128,6 +128,14 @@ async def get_cropped():
     
     return FileResponse(cropped_path, media_type="image/jpg")
 
+@app.get("/aura_analyze/white-balanced")
+async def get_corrected():
+    corrected_path = "combined_demo/intermediate-imgs/white-balanced.jpg"
+    if not os.path.exists(corrected_path):
+        raise HTTPException(status_code=404, detail=f"Corrected image not found")
+    
+    return FileResponse(corrected_path, media_type="image/jpg")
+
 @app.get("/aura_analyze/palette")
 async def get_palette():
     palette_path = "combined_demo/output-imgs/your-palette.jpg"
