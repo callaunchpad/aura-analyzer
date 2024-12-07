@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import argparse
 import torch
 from torchvision import transforms
@@ -66,7 +67,7 @@ def train_model(model, train_loader, criterion, optimizer, num_epochs=10, device
     save_dir = os.path.dirname(save_path)
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-
+    
     # Model is set to training mode
     model.train()
     for epoch in range(num_epochs):
@@ -89,11 +90,10 @@ def train_model(model, train_loader, criterion, optimizer, num_epochs=10, device
 
         epoch_loss = running_loss / len(train_loader)
         epoch_accuracy = correct / total * 100
-        print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.2f}%")
+        # print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.2f}%")
 
     # Save the model after training
     torch.save(model.state_dict(), save_path)
-    print(f"Model saved to {save_path}")
 
 
 # Testing Function
@@ -135,9 +135,19 @@ def load_pretrained_model(model, save_path='color_analysis/trained_model.pth', d
     if os.path.exists(save_path):
         model.load_state_dict(torch.load(save_path, map_location=device, weights_only=True))
         model.eval()
-    else:
-        print("No pretrained model found. Training from scratch.")
     return model
+
+def save_season_palette(predicted_season):
+    palette = extract_colors(image=f'color_analysis/nonspecific-season-palettes/{predicted_season}-palette.jpg', palette_size=48)
+    w, h = 48, 48
+    img = Image.new("RGB", size=(w * palette.number_of_colors, h))
+    arr = np.asarray(img).copy()
+    for i in range(palette.number_of_colors):
+        c = palette.colors[i]
+        arr[:, i * h : (i + 1) * h, :] = c.rgb
+    img = Image.fromarray(arr, "RGB")
+
+    img.save(f"combined_demo/output-imgs/your-palette.jpg")
 
 def main():
     # Get the image path for the prediction
@@ -177,20 +187,18 @@ def main():
 
     model = load_pretrained_model(model, save_path, device)
     if not os.path.exists(save_path):
-        print("Training the model...")
         train_model(model, train_loader, criterion, optimizer, num_epochs=num_epochs, device=device, save_path=save_path)
 
-    test_loss, test_accuracy = test_model(model, test_loader, device=device)
-    print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.2f}%")
+    # test_loss, test_accuracy = test_model(model, test_loader, device=device)
+    # print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.2f}%")
 
     # Predict the season of the input image with the trained model
     predicted_season = predict_image(model, args.image_path, class_labels, transform, device=device)
     if predicted_season:
-        print(f"Predicted Season: {predicted_season}")
-        palette = extract_colors(image=f'color_analysis/nonspecific-season-palettes/{predicted_season}-palette.jpg', palette_size=48)
-        palette.display(save_to_file=True, filename="combined_demo/output-imgs/your-palette.png")
+        print(f"your color season is {predicted_season}")
+        save_season_palette(predicted_season)    
     else:
-        print(f"No season was predicted. Please try again with a different image.")
+        print(f"your color season is null")
     
 
 if __name__ == "__main__":
