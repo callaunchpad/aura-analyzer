@@ -130,7 +130,7 @@ def predict_image(model, image_path, class_labels, transform, device='cpu'):
 
 
 def load_pretrained_model(model, save_path='color_analysis/trained_model.pth', device='cpu'):
-    """Loads a previously trained model or starts from scratch if no model is found"""
+    """Loads a previously trained model or creates the model from scratch if no model is found"""
     if os.path.exists(save_path):
         model.load_state_dict(torch.load(save_path, map_location=device, weights_only=True))
         model.eval()
