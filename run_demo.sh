@@ -16,7 +16,7 @@ python3 color_correction/PyTorch/demo_single_image.py --i "combined_demo/input-i
 python3 face_detect/facedec/facedetect.py --i  "combined_demo/intermediate-imgs/white-balanced.jpg"
 
 # Run color analysis
-python3 color_analysis/color_analysis.py --i "combined_demo/output-imgs/cropped.jpg"
+python3 color_analysis/color_analysis_model.py --i "combined_demo/output-imgs/cropped.jpg"
 
 # run below script in command line to test 
 # ./run_demo.sh [image-name.jpg]
