@@ -174,12 +174,11 @@ def main():
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
-    # Create training and testing sets
+    # Create training sets, testing sets, and DataLoaders
     train_set, test_set, train_labels, test_labels, class_labels = load_and_split_data(data_dir)
     train_dataset = ColorDataset(train_set, train_labels, transform=transform)
     test_dataset = ColorDataset(test_set, test_labels, transform=transform)
 
-    # Create DataLoaders for batch processing
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
