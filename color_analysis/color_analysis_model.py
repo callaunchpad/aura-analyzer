@@ -96,7 +96,6 @@ def train_model(model, train_loader, criterion, optimizer, num_epochs=10, device
     torch.save(model.state_dict(), save_path)
 
 
-# Testing Function
 def test_model(model, test_loader, device='cpu'):
     """Evaluate the model on the test set and return accuracy"""
     # Model is set to evaluation mode
@@ -120,6 +119,7 @@ def test_model(model, test_loader, device='cpu'):
     test_accuracy = correct / total * 100
     return test_loss, test_accuracy
 
+
 def predict_image(model, image_path, class_labels, transform, device='cpu'):
     """Predicts the class of a single image"""
     model.eval()
@@ -130,12 +130,14 @@ def predict_image(model, image_path, class_labels, transform, device='cpu'):
         _, pred = torch.max(outputs, 1)
         return class_labels[pred.item()]
 
+
 def load_pretrained_model(model, save_path='color_analysis/trained_model.pth', device='cpu'):
     """Loads a previously trained model or starts from scratch if no model is found"""
     if os.path.exists(save_path):
         model.load_state_dict(torch.load(save_path, map_location=device, weights_only=True))
         model.eval()
     return model
+
 
 def save_season_palette(predicted_season):
     palette = extract_colors(image=f'color_analysis/nonspecific-season-palettes/{predicted_season}-palette.jpg', palette_size=48)
@@ -148,6 +150,7 @@ def save_season_palette(predicted_season):
     img = Image.fromarray(arr, "RGB")
 
     img.save(f"combined_demo/output-imgs/your-palette.jpg")
+
 
 def main():
     # Get the image path for the prediction
