@@ -1,3 +1,4 @@
+
 import requests 
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -24,41 +25,33 @@ request = requests.get(base_url, headers=headers)
 seasonal_images = {}
 seasons = ['spring','winter','summer','autumn']
 
-# #  extract all img tags with class img
-# for s in seasons:
-#     s_links = []
-#     for url in seasons_links_dict[s]:
-#         request = requests.get(base_url+url, headers=headers)
-#         soup = BeautifulSoup(request.content, 'html.parser')
-#         images = soup.find_all('img', attrs={'class':'thumb-image'})
-#         links = [listing['data-src'] for listing in images]
-#         s_links.extend(links)
-#     seasonal_images[s] = s_links
-
-# for s in seasonal_images.keys():
-#     for i in range(len(seasonal_images[s])):
-#         print(f"Processing image {i+1} / {len(seasonal_images[s])}")
-#         try:
-#             # Download image from URL
-#             r = requests.get(seasonal_images[s][i], stream=True)
-#             r.raise_for_status()  # Raise an exception for HTTP errors
-
-#             # Save the image locally
-#             local_path = filename.format(s, i)
-#             with open(local_path, "wb") as f:
-#                 f.write(r.content)
-
-#             # Update the image path in seasonal_images
-#             seasonal_images[s][i] = local_path
-#         except requests.exceptions.RequestException as e:
-#             print(f"Error downloading {seasonal_images[s][i]}: {e}")
-#         except Exception as e:
-#             print(f"An error occurred with image {seasonal_images[s][i]}: {e}")
+#  extract all img tags with class img, download the images, and save onto dictionary
+for s in seasons:
+    i = 0
+    s_links = []
+    for url in seasons_links_dict[s]:
+        try: 
+            request = requests.get(base_url+url, headers=headers)
+            soup = BeautifulSoup(request.content, 'html.parser')
+            images = soup.find_all('img', attrs={'class':'thumb-image'})
+            links = [listing['data-src'] for listing in images]
+            for l in links: 
+                local_path = filename.format(s, i)
+                with open(local_path, "wb") as f:
+                    f.write(l.content)
+                i += 1
+                s_links.append(local_path)
+        except requests.exceptions.RequestException as e:
+            print(f"Error downloading {seasonal_images[s][i]}: {e}")
+        except Exception as e:
+            print(f"An error occurred with image {seasonal_images[s][i]}: {e}")
+    seasonal_images[s] = s_links
 
 processed_images = {}
 script_path = "./preprocess.sh"
-# Directory to save processed images
 
+
+#Run preprocess script on each image
 for s in seasons: 
     input_folder = f"../../combined-demo/pics/{s}"
     output_folder = f"../../combined-demo/processed_images/{s}"
@@ -74,3 +67,5 @@ for s in seasons:
     
 
         
+
+
