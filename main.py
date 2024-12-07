@@ -9,6 +9,7 @@ import os
 from sqlmodel import Field, Session, SQLModel, or_, create_engine, select
 from sqlalchemy import func
 import subprocess
+import uvicorn
 
 class AuraRequest(BaseModel):
     Department: Literal['menswear', 'womenswear']
@@ -56,6 +57,10 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 app = FastAPI()
 
+# Ensure the app listens on the correct port
+if __name__ == '__main__':
+    uvicorn.run('main:app', host='0.0.0.0', port=8000)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all origins
@@ -67,6 +72,10 @@ app.add_middleware(
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
 @app.on_event("startup")
 def on_startup():
