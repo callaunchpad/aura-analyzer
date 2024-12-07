@@ -90,7 +90,7 @@ def train_model(model, train_loader, criterion, optimizer, num_epochs=10, device
 
         epoch_loss = running_loss / len(train_loader)
         epoch_accuracy = correct / total * 100
-        # print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.2f}%")
+        print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.2f}%")
 
     # Save the model after training
     torch.save(model.state_dict(), save_path)
