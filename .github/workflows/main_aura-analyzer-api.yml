@@ -33,9 +33,6 @@ jobs:
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
-      
-      - name: List contents of release.zip for debugging
-        run: unzip -l release.zip
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v3
@@ -57,16 +54,9 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: python-app
-      
-      # Create the /home/site/wwwroot directory if it doesn't exist
-      - name: Create /home/site/wwwroot directory
-        run: mkdir -p /home/site/wwwroot
 
       - name: Unzip artifact for deployment
-        run: unzip release.zip -d /home/site/wwwroot
-      
-      - name: List contents after unzip
-        run: ls -la /home/site/wwwroot
+        run: unzip release.zip
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
