@@ -13,7 +13,8 @@ Pylette
 mediapipe
 imutils
 fastapi[all]
-uvicorn
+uvicorn[standard]
 sqlmodel
 gunicorn
 SQLAlchemy
+pydantic
